@@ -1,8 +1,9 @@
-# Linux Monitoring v1.0
+# LinuxMonitoring v2.0
 
-Linux basic bash scripting and system research.
+Real-time monitoring and research of the system status.
 
 The russian version of the task can be found in the repository.
+
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -10,60 +11,62 @@ The russian version of the task can be found in the repository.
 
 1. [Chapter I](#chapter-i) 
 2. [Chapter II](#chapter-ii) \
-    2.1. [Bash](#bash) \
-    2.2. [Shell](#shell)
+    2.1. [GoAccess](#goaccess) \
+    2.2. [Prometheus](#prometheus) \
+    2.3. [Grafana](#grafana)
 3. [Chapter III](#chapter-iii) \
-    3.1. [First effort](#part-1-first-effort)  
-    3.2. [System research](#part-2-system-research)  
-    3.3. [Visual output design for the system research script](#part-3-visual-output-design-for-the-system-research-script)   
-    3.4. [Configuring visual output design for the system research script.](#part-4-configuring-visual-output-design-for-the-system-research-script)  
-    3.5. [File system research](#part-5-file-system-research)    
-4. [Chapter IV](#chapter-iv)
+    3.1. [File generator](#part-1-file-generator)  
+    3.2. [File system clogging](#part-2-file-system-clogging)  
+    3.3. [Cleaning the file system](#part-3-cleaning-the-file-system)  
+    3.4. [Log generator](#part-4-log-generator)  
+    3.5. [Monitoring](#part-5-monitoring)  
+    3.6. [GoAccess](#part-6-goaccess)  
+    3.7. [Prometheus and Grafana](#part-7-prometheus-and-grafana)  
+    3.8. [A ready-made dashboard](#part-8-a-ready-made-dashboard)  
+    3.9. [Bonus. Your own node_exporter](#part-9-bonus-your-own-node_exporter)  
+
 
 ## Chapter I
 
-![linux_monitoring_v1](misc/images/linux_monitoring_v1.png)
+![linux_monitoringv2.0](misc/images/linux_monitoringv2.0.png)
 
-Planet Earth, USA, California, nowadays.
+Planet Earth, today.
 
-John (that's you) was working late as usual to avoid having to drive home in the rush hour traffic.
-You thought you were the only one in the office, until you heard noises coming from the office next door.
-You didn't pay much attention, it could just be a colleague staying late to finish their business.
-Suddenly you heard a scream coming from that very office (your colleague obviously thought he was alone), "Ugh, I am so tired of collecting system information by hand from these computers on Linux. I probably should have learned it better before applying for the job."
+The working day has just started and you've already been called in to see your boss. They tell you that your buddy Seb hasn't come to work for four days. There is a risk that his task will not be completed on time.
+So it's up to you to find out about monitoring in Linux, so that you can take over for your careless colleague if necessary.
 
-You quickly realised that this was your new system administrator, who had been hired just a few weeks before. On the initiative of your colleague Mike, Linux has been installed on several machines in the office.
-That sysadmin is really trying, he's just unlucky to get a job now. \
-"Poor guy," you thought. "I should try to help him, since I have the time!"
+You enter Seb's office, sit down in front of his computer and immediately open a suspiciously small file containing his notes.
+As you read through the information Seb has gathered, you can't help but think about the delicious lunch you left in the break room...
 
-You went to Mike's desk and did something bad: looked in his drawer. Luckily, you found exactly what you're looking for: clippings of articles about Bash and Shell. 
 
 ## Chapter II
 
-### Bash
+### **GoAccess**
 
->Bash is the shell, or command language interpreter, for the GNU operating system.
->
->The name is an acronym for "Bourne-Again SHell", a pun on Stephen Bourne, the author of the direct ancestor of the current Unix shell, sh, which appeared in the Seventh Edition Bell Labs Research version of Unix.
->
->Bash is largely compatible with sh and incorporates useful features from the Korn shell ksh and the C shell csh. It is intended to be a compliant implementation of the IEEE POSIX Shell and Tools portion of the IEEE POSIX specification (IEEE Standard 1003.1). It provides functional improvements over sh for both interactive and programming use.
->
->While the GNU operating system provides other shells, including a version of csh, Bash is the default shell. Like other GNU software, Bash is quite portable. It currently runs on almost every version of Unix and a few other operating systems - independently supported ports exist for MS-DOS, OS/2 and Windows platforms.
+GoAccess is a log analyser that can handle logs in real time, visualise the information and pass it on via either a terminal or a web browser as a web page.
 
-### Shell
+### **Prometheus**
 
->At its base, a shell is simply a macro processor that executes commands.
->
->A Unix shell is both a command interpreter and a programming language. As a command interpreter, the shell provides the user interface to the rich set of GNU utilities. Files containing commands can be created, and become commands themselves. These new commands have the same status as system commands, allowing users or groups to establish custom environments to automate their common tasks.
->
->Shells may be used interactively or non-interactively. In interactive mode, they accept input typed from the keyboard. When executing non-interactively, shells execute commands read from a file.
->
->A shell allows GNU commands to be executed both synchronously and asynchronously.
->
->While command execution is essential, most of the power (and complexity) of shells comes from the programming languages they contain. Like any high-level language, the shell provides variables, flow control constructs, quoting, and functions.
->
->Shells provide features specifically designed for interactive use, rather than to extend the programming language. These interactive features include job control, command line editing, command history and aliases.
+Time series databases, just as their name implies, are database systems, specifically developed to handle time-related data.
 
-In Mike's drawer, there was a folder labelled "Materials" under the article clippings. When you looked in it, you found several sheets describing the features of bash scripts.
+Most systems use relational, table-based databases. Time series databases work differently.
+Data is still stored in 'collections', but these collections have one common thing: they aggregate over time.
+Basically, this means that for each point that can be saved, there is a timestamp related to it.
+
+Prometheus is a time series database to which an entire ecosystem of tools can be attached to extend its functionality. \
+Prometheus is created to monitor a wide variety of systems: servers, databases, virtual machines, basically almost anything.
+
+### **Grafana**
+
+Grafana is a platform for data visualisation, monitoring and analysis.
+Grafana allows users to create *dashboards* with *panels*, each displaying specific indicators over a set period of time.
+
+Each *dashboard* is universal, so it can be customised for a certain project.
+
+*Panel* is the basic visualisation element of the selected indicators.
+
+*Dashboard* is a set of one or more panels placed in a grid with a set of variables (e.g. server name, application name, etc.).
+
 
 ## Chapter III
 
@@ -74,161 +77,181 @@ In Mike's drawer, there was a folder labelled "Materials" under the article clip
 - All scripts should have checks for incorrect input (not all parameters specified, wrong format parameters, etc.);
 - All scripts must be run on a virtual machine *Ubuntu Server 20.04 LTS*.
 
-## Part 1. First effort
 
-Before you start helping your colleague, you decide to test your knowledge on a very simple program.
+## Part 1. File generator
 
-**== Task ==**
+After a quick look at the information you found on Seb's computer, you go to the break room to find that Mike has taken your delicious sandwich that you brought from home.
 
-Write a bash script. The script is run with one parameter. It is a text parameter.  
-The script outputs the value of the parameter.  
-If the parameter is a number, the script must output an invalid input message.
+You can't just let him get away with it, you have to play a prank on him and teach him a lesson.
 
-## Part 2. System research
-
-Now you’re sure that you’re ready to get down to the initial idea. You quickly think of the information about the system you need to output and get to work.
+This will give you a chance to practise working with files in bash scripts. It can be useful in preparing a test environment for setting up monitoring tasks.
 
 **== Task ==**
 
-Write a bash script. The script should output the following information:
+Write a bash script. The script is run with 6 parameters. An example of running a script: \
+`main.sh /opt/test 4 az 5 az.az 3kb`
 
-**HOSTNAME** = _network name_  
-**TIMEZONE** = _time zone as: **America/New_York UTC -5** (time zone must be taken from the system and be correct for the current location)_  
-**USER** = _current user who ran the script_  
-**OS** = _type and version of operating system_  
-**DATE** = _current time as: **12 May 2020 12:24:36**_  
-**UPTIME** = _system uptime_  
-**UPTIME_SEC** = _system uptime in seconds_  
-**IP** = _ip address of the machine on any of the network interfaces  
-**MASK** = _network mask of any of the network interfaces as: **xxx.xxx.xxx.xxx**_.  
-**GATEWAY** = _default gateway ip_  
-**RAM_TOTAL** = _main memory size in GB with an accuracy of three decimal places as: **3.125 GB**_  
-**RAM_USED** = _used memory size in GB with an accuracy of three decimal places_  
-**RAM_FREE** = _free memory size in GB, with an accuracy of three decimal places_  
-**SPACE_ROOT** = _root partition size in MB, with an accuracy of two decimal places, as **254.25 MB**_  
-**SPACE_ROOT_USED** = _size of used space of the root partition in MB, with an accuracy of two decimal places_  
-**SPACE_ROOT_FREE** = _size of free space of the root partition in MB, with an accuracy of two decimal places_
+**Parameter 1** is the absolute path. \
+**Parameter 2** is the number of subfolders. \
+**Parameter 3** is a list of English alphabet letters used in folder names (no more than 7 characters). \
+**Parameter 4** is the number of files in each created folder. \
+**Parameter 5** — the list of English alphabet letters used in the file name and extension (no more than 7 characters for the name, no more than 3 characters for the extension). \
+**Parameter 6** — file size (in kilobytes, but not more than 100).
 
-After outputting the values, suggest writing the data to a file (ask the user to answer **Y/N**).  
-Responses **Y** and **y** are considered positive, all others - negative.
+Folder and file names must only consist of the letters specified in the parameters and use each of them at least 1 time.  
+The length of this part of the name should be at least 4 characters, plus the script run date in DDMMYY format, separated by underscores, for example: \
+**./aaaz_021121/**, **./aaazzzz_021121** 
 
-If the user agrees, create a file in the current directory containing the information that had been outputted.
-The file name must looks like: **DD_MM_YY_HH_MM_SS.status** (The time in the file name must indicate when the data was saved).
+If `az` has been specified for a folder or a file name, there can be no inverse entry: \
+**./zaaa_021121/** i.e. the order of the characters specified in the parameter must be maintained.
 
-## Part 3. Visual output design for the system research script
+When the script runs in the location specified in parameter 1, the folders and files should be created in them with the appropriate names and sizes. The script should stop running if there is 1GB of free space left on the file system (in the / partition).
 
-Everything is ready! But it looks so boring... We need to add more colours to this world!
+Make a log file with data on all created folders and files (full path, creation date, file size).
+
+
+## Part 2. File system clogging
+
+And now it's time for Mike to have a taste of what a man who's had a sandwich stolen is capable of.
 
 **== Task ==**
 
-Write a bash script. Use the script from [**Part 2**](#part-2-system-research) and remove the part where the data is saved to a file.  The script is run with 4 parameters. The parameters are numeric. From 1 to 6, for example:  
-`script03.sh 1 3 4 5`
+Write a bash script. The script is run with 3 parameters. An example of running a script: \
+`main.sh az az.az 3Mb`
 
-Colour designations: (1 - white, 2 - red, 3 - green, 4 - blue, 5 - purple, 6 - black)
+**Parameter 1** is a list of English alphabet letters used in folder names (no more than 7 characters). \
+**Parameter 2** the list of English alphabet letters used in the file name and extension (no more than 7 characters for the name, no more than 3 characters for the extension). \
+**Parameter 3** — is the file size (in Megabytes, but not more than 100).
 
-**Parameter 1** is the background of the value names (HOSTNAME, TIMEZONE, USER etc.)  
-**Parameter 2** is the font colour of the value names (HOSTNAME, TIMEZONE, USER etc.)  
-**Parameter 3** is the background of the values (after the '=' sign)  
-**Parameter 4** is the font colour of the values (after the '=' sign)
+Folder and file names must only consist of the letters specified in the parameters and use each of them at least 1 time.  
+The length of this part of the name should be at least 5 characters, plus the script run date in DDMMYY format, separated by underscores, for example: \
+**./aaazz_021121/**, **./aaazzzz_021121** 
 
-The font and background colours of one column must not match.  
-If matching values are entered, there must be a message describing the problem and offering to call the script again.
-After the message output, the program should exit correctly.
+If `az` has been specified for a folder or a file name, there can be no inverse entry: \
+**./zaaa_021121/** i.e. the order of the specified characters in the parameter must be maintained.
 
-## Part 4. Configuring visual output design for the system research script
+When running the script, file folders must be created in different (any, except paths containing **bin** or **sbin**) locations on the file system.
+The number of subfolders is up to 100. The number of files in each folder is a random number (different for each folder). The script should stop running when there is 1GB of free space left on the file system (in the / partition).
+Check the file system free space with  `df -h /`.
 
-Now everything looks nice! But I don't want to have to enter the colours as parameters every time... I'll have to come up with something more convenient.
+Make a log file with data on all created folders and files (full path, creation date, file size).
 
-**== Task ==**
-
-Write a bash script. Use the script from [**Part 3**](#part-3-visual-output-design-for-the-system-research-script). The colour designations are similar. The script runs without parameters. The parameters are set in the configuration file before the script is running.
-
-This is how the configuration file must look like:
-```
-column1_background=2
-column1_font_color=4
-column2_background=5
-column2_font_color=1
-```
-
-If one or more parameters are not set in the configuration file, the colour must be substituted from the default colour scheme. (Choice is at the developer's discretion).
+At the end of the script, display the start time, end time and total running time of the script. Complete the log file with this data.
 
 
-After the system information output from [**Part 3**](#part-3-visual-output-design-for-the-system-research-script), you should output the colour scheme by indenting one empty line as follows:
-```
-Column 1 background = 2 (red)
-Column 1 font color = 4 (blue)
-Column 2 background = 5 (purple)
-Column 2 font color = 1 (white)
-```
+## Part 3. Cleaning the file system
 
-When running the script with the default colour scheme, the output should look like this:
-```
-Column 1 background = default (black)
-Column 1 font color = default (white)
-Column 2 background = default (red)
-Column 2 font color = default (blue)
-```
-
-## Part 5. File system research
-
-Now that the system information output is prepared, looks nice and is convenient, you can get down to the second part of the plan.
+Damn it! You ran the script on the wrong computer. Now you urgently need to write a script to fix it.
 
 **== Task ==**
 
-Write a bash script. The script is run with a single parameter.  
-The parameter is an absolute or relative path to a directory. The parameter must end with '/', for example:  
-`script05.sh /var/log/`
+Write a bash script. The script is run with 1 parameter. The script should be able to clear the system from the folders and files created in [Part 2](#part-2-file-system-clogging) in 3 ways:
 
-The script must output the following information about the directory specified in the parameter:
-- Total number of folders, including subfolders
-- Top 5 folders with largest size in descending order (path and size)
-- Total number of files
-- Number of configuration files (with .conf extension), text files, executable files, log files (files with .log extension), archives, symbolic links
-- Top 10 files with largest size in descending order (path, size and type)
-- Top 10 executable files with largest size in descending order (path, size and hash)
-- Execution time of the script
+1. By log file
+2. By creation date and time
+3. By name mask (i.e. characters, underlining and date).
 
-The script should output the following information:
+The cleaning method is set as a parameter with a value of 1, 2 or 3 when you run the script.
 
-```
-Total number of folders (including all nested ones) = 6  
-TOP 5 folders of maximum size arranged in descending order (path and size):  
-1 - /var/log/one/, 100 GB  
-2 - /var/log/two/, 100 MB  
-etc up to 5
-Total number of files = 30
-Number of:  
-Configuration files (with the .conf extension) = 1 
-Text files = 10  
-Executable files = 5
-Log files (with the extension .log) = 2  
-Archive files = 3  
-Symbolic links = 4  
-TOP 10 files of maximum size arranged in descending order (path, size and type):  
-1 - /var/log/one/one.exe, 10 GB, exe  
-2 - /var/log/two/two.log, 10 MB, log  
-etc up to 10  
-TOP 10 executable files of the maximum size arranged in descending order (path, size and MD5 hash of file):  
-1 - /var/log/one/one.exe, 10 GB, 3abb17b66815bc7946cefe727737d295  
-2 - /var/log/two/two.exe, 9 MB, 53c8fdfcbb60cf8e1a1ee90601cc8fe2  
-etc up to 10  
-Script execution time (in seconds) = 1.5
-```
+*When deleting by date and time of creation, the user enters the start and end times up to the minute. All files created within the specified time interval must be deleted. The input can be implemented either through parameters or at runtime.*
 
 
-## Chapter IV
+## Part 4. Log generator
 
-Well, now you've done all the work you wanted to do. You had to stay a little longer than usual, but it was worth it.
-You pack up your things and on your way out of the office you look into the room where you heard your colleague earlier.
+You are finally done with your stuff and ready to continue working out the monitoring.
 
-"Hey, may I come in?" you knocked on the door.
+To begin with, it would be a good idea to create logs that can be analysed.
 
-"Yes... just a second. I didn't think there was anyone else here at this hour."
+**== Task ==**
 
-The door opened and, after a brief chat, you handed the inexperienced sysadmin a flash drive containing the scripts.
-You said goodbye and were about to leave when you remembered an important detail.
+Write a bash script or a C program that generates 5 **nginx** log files in *combined* format. Each log should contain information for 1 day.
 
-"Oh, I completely forgot. I'am John by the way. And what's your name?"
+A random number between 100 and 1000 entries should be generated per day.
+For each entry there should be randomly generated the following:
 
-"Sebastian."
+1. IP (any correct one, i.e. no ip such as 999.111.777.777)
+2. Response codes (200, 201, 400, 401, 403, 404, 500, 501, 502, 503)
+3. methods (GET, POST, PUT, PATCH, DELETE)
+4. Dates (within a specified log day, should be in ascending order)
+5. Agent request URL
+6. Agents (Mozilla, Google Chrome, Opera, Safari, Internet Explorer, Microsoft Edge, Crawler and bot, Library and net tool)
+
+Specify in the comments of your script/program what each of the response codes used means.
+
+
+## Part 5. Monitoring
+
+Now that you have the files to analyse, you can move on to monitoring.
+
+**== Task ==**
+
+Write a bash script to parse **nginx** logs from [Part 4](#part-4-log-generator) via **awk**.
+The script is run with 1 parameter, which has a value of 1, 2, 3 or 4.
+
+Depending on the value of the parameter, output the following:
+
+1. All entries sorted by response code;
+2. All unique IPs found in the entries;
+3. All requests with errors (response code — 4xx or 5xxx);
+4. All unique IPs found among the erroneous requests.
+
+
+## Part 6. **GoAccess**
+
+Watching the results of your efforts in the console is certainly nice, but why not also use a ready-made solution that provides a user-friendly interface?
+
+**== Task ==**
+
+Use the GoAccess utility to get the same information as in [Part 5](#part-5-monitoring)
+
+Open the web interface of the utility on the local machine.
+
+
+## Part 7. **Prometheus** and **Grafana**
+
+Practice with the logs is over for now. It's time to monitor the state of the system in general.
+
+**== Task ==**
+
+##### Install and configure **Prometheus** and **Grafana** in virtual machine.
+##### Access the **Prometheus** and **Grafana** web interfaces from a local machine.
+
+##### Add to the **Grafana** dashboard a display of CPU, available RAM, free space and the number of I/O operations on the hard disk.
+
+##### Run your bash script from [Part 2](#part-2-file-system-clogging).
+##### Check the hard disk load (disk space and read/write operations).
+
+##### Install the **stress** utility and run the following command `stress -c 2 -i 1 -m 1 --vm-bytes 32M -t 10s`.
+##### Check the hard disk, RAM and CPU load.
+
+
+## Part 8. A ready-made dashboard
+
+After all, why make your own dashboard when, as they say, "everything has already been stolen before us"?
+Why not get a ready-made dashboard that has all the metrics you need?
+
+**== Task ==**
+
+##### Download the ready-made dashboard *Node Exporter Quickstart and Dashboard* from **Grafana Labs** official website.
+
+##### Run the same tests as in [Part 7](#part-7-prometheus-and-grafana).
+
+##### Start another virtual machine within the same network as the current one.
+##### Run a network load test using **iperf3**.
+
+##### Check the network interface load.
+
+
+## Part 9. Bonus. Your own *node_exporter*
+
+It is always useful and convenient to analyse the system with special utilities, but you have always wanted to understand how they work.
+
+**== Task ==**
+
+Write a bash script or a C program that collects information on basic system metrics (CPU, RAM, hard disk (capacity)). The script or a program should make a html page in **Prometheus** format, which will be served by **nginx**. \
+The page itself can be refreshed within a bash script or a program (in a loop), or using the cron utility, but not more often than every 3 seconds.
+
+##### Change the **Prometheus** configuration file so it collects information from the page you created.
+
+##### Run the same tests as in [Part 7](#part-7-prometheus-and-grafana).
+

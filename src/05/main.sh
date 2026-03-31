@@ -1,101 +1,198 @@
 #!/bin/bash
 
-start_time=$(date +%s.%N)
-
-target_dir="$1"
-
-if [ ! -d "$target_dir" ]; then
-    echo "Error: Directory '$target_dir' does not exist"
+if [ $# -ne 1 ]; then
+    echo "Использование: $0 <параметр>"
+    echo "Параметры:"
+    echo "  1 - Все записи, отсортированные по коду ответа"
+    echo "  2 - Все уникальные IP, встречающиеся в записях"
+    echo "  3 - Все запросы с ошибками (код ответа 4хх или 5хх)"
+    echo "  4 - Все уникальные IP, которые встречаются среди ошибочных запросов"
     exit 1
 fi
 
-total_folders=$(find "$target_dir" -type d | wc -l)
-echo "Total number of folders (including all nested ones) = $total_folders"
+if [[ ! "$1" =~ ^[1-4]$ ]]; then
+    echo "Ошибка: параметр должен быть 1, 2, 3 или 4"
+    exit 1
+fi
 
-echo "TOP 5 folders of maximum size arranged in descending order (path and size):"
-du -h "$target_dir" | sort -rh | head -6 | tail -5 | awk '{print NR " - " $2 ", " $1}' | while IFS= read -r line; do
-    echo "$line"
-done
-total_files=$(find "$target_dir" -type f | wc -l)
-echo "Total number of files = $total_files"
 
-echo "Number of:"
+log_files=$(ls ../04/access_*.log 2>/dev/null | head -5)
+if [ -z "$log_files" ]; then
+    echo "Ошибка: не найдены файлы логов ../04/access_*.log"
+    exit 1
+fi
 
-conf_files=$(find "$target_dir" -type f -name "*.conf" | wc -l)
-echo "Configuration files (with the .conf extension) = $conf_files"
 
-text_files=$(find "$target_dir" -type f -exec file {} \; | grep -i "text" | wc -l)
-echo "Text files = $text_files"
+get_status_code() {
+    echo "$1" | awk -F ' - ' '{print $5}'
+}
 
-exec_files=$(find "$target_dir" -type f -executable | wc -l)
-echo "Executable files = $exec_files"
 
-log_files=$(find "$target_dir" -type f -name "*.log" | wc -l)
-echo "Log files (with the extension .log) = $log_files"
+get_ip() {
+    echo "$1" | awk -F ' - ' '{print $1}'
+}
 
-archive_files=$(find "$target_dir" -type f \( -name "*.zip" -o -name "*.tar" -o -name "*.gz" -o -name "*.bz2" -o -name "*.7z" -o -name "*.rar" \) | wc -l)
-echo "Archive files = $archive_files"
 
-symlinks=$(find "$target_dir" -type l | wc -l)
-echo "Symbolic links = $symlinks"
+get_method() {
+    echo "$1" | awk -F ' - ' '{print $3}'
+}
 
-echo "TOP 10 files of maximum size arranged in descending order (path, size and type):"
 
-temp_file=$(mktemp)
+get_url() {
+    echo "$1" | awk -F ' - ' '{print $4}'
+}
 
-find "$target_dir" -type f -exec ls -lh {} + | awk 'NR>1 {
-    size=$5
-    path=$9
-    for(i=10;i<=NF;i++) path=path" "$i
-    split(path, arr, ".")
-    ext=tolower(arr[length(arr)])
-    if (ext ~ /conf/) type="conf"
-    else if (ext ~ /log/) type="log"
-    else if (ext ~ /(exe|sh|bash|run)/) type="exe"
-    else if (ext ~ /(zip|tar|gz|bz2|7z|rar)/) type="archive"
-    else type="other"
-    print size " " path " " type
-}' | sort -hr -k1 | head -10 | awk '{
-    printf "%d - %s, %s, %s\n", NR, $2, $1, $3
-}' | while IFS= read -r line; do
-    echo "$line"
-done
 
-echo "TOP 10 executable files of the maximum size arranged in descending order (path, size and MD5 hash of file):"
+get_date() {
+    echo "$1" | awk -F ' - ' '{print $2}'
+}
 
-find "$target_dir" -type f -executable -exec ls -lh {} + | awk 'NR>1 {
-    size=$5
-    path=$9
-    for(i=10;i<=NF;i++) path=path" "$i
-    print size " " path
-}' | sort -hr -k1 | head -10 | while IFS= read -r line; do
-    size=$(echo "$line" | awk '{print $1}')
-    filepath=$(echo "$line" | cut -d' ' -f2-)
+
+print_log_entry() {
+    local entry="$1"
+    local status=$(get_status_code "$entry")
+    local ip=$(get_ip "$entry")
     
-    if [ -f "$filepath" ]; then
-        if command -v md5sum &> /dev/null; then
-            hash=$(md5sum "$filepath" | awk '{print $1}')
-        elif command -v md5 &> /dev/null; then
-            hash=$(md5 -q "$filepath")
-        else
-            hash="N/A"
-        fi
+    
+    case $status in
+        2*) 
+            printf "\033[32m%s\033[0m\n" "$entry"
+            ;;
+        4*) 
+            printf "\033[33m%s\033[0m\n" "$entry"
+            ;;
+        5*) 
+            printf "\033[31m%s\033[0m\n" "$entry"
+            ;;
+        *)
+            echo "$entry"
+            ;;
+    esac
+}
+
+
+case $1 in
+    1)
         
-        echo "$size - $filepath, $hash"
-    fi
-done | awk '{
-    printf "%d - %s, %s\n", NR, $3, $1
-}' | sed 's/, /, /g' | while IFS= read -r line; do
-    hash=$(echo "$line" | grep -o '[a-f0-9]\{32\}' | head -1)
-    if [ ! -z "$hash" ]; then
-        echo "$line" | sed "s/, [a-f0-9]\{32\}/, $hash/"
-    else
-        echo "$line"
-    fi
-done
-
-rm -f "$temp_file"
-
-end_time=$(date +%s.%N)
-execution_time=$(echo "$end_time - $start_time" | bc)
-echo "Script execution time (in seconds) = $execution_time"
+        echo "=== Все записи, отсортированные по коду ответа ==="
+        echo ""
+        
+        
+        for file in $log_files; do
+            cat "$file"
+        done | awk -F ' - ' '{
+            
+            split($5, parts, " ")
+            status = parts[1] + 0
+            printf "%04d %s\n", status, $0
+        }' | sort -n | sed 's/^[0-9]* //' | while read line; do
+            print_log_entry "$line"
+        done
+        
+        total_count=$(for file in $log_files; do cat "$file"; done | wc -l)
+        echo ""
+        echo "Всего записей: $total_count"
+        ;;
+        
+    2)
+        
+        echo "=== Все уникальные IP ==="
+        echo ""
+        
+        
+        for file in $log_files; do
+            awk -F ' - ' '{print $1}' "$file"
+        done | sort -t '.' -k1,1n -k2,2n -k3,3n -k4,4n | uniq | while read ip; do
+            
+            count=0
+            for file in $log_files; do
+                file_count=$(grep -c "^$ip - " "$file")
+                count=$((count + file_count))
+            done
+            printf "IP: %-15s | Запросов: %d\n" "$ip" "$count"
+        done
+        
+        unique_count=$(for file in $log_files; do awk -F ' - ' '{print $1}' "$file"; done | sort -u | wc -l)
+        echo ""
+        echo "Всего уникальных IP: $unique_count"
+        ;;
+        
+    3)
+        
+        echo "=== Запросы с ошибками (4хх и 5хх) ==="
+        echo ""
+        echo "Коды 4хх - ошибки клиента:"
+        echo "  400 - Bad Request (Некорректный запрос)"
+        echo "  401 - Unauthorized (Требуется аутентификация)"
+        echo "  403 - Forbidden (Доступ запрещен)"
+        echo "  404 - Not Found (Ресурс не найден)"
+        echo ""
+        echo "Коды 5хх - ошибки сервера:"
+        echo "  500 - Internal Server Error (Внутренняя ошибка сервера)"
+        echo "  501 - Not Implemented (Метод не поддерживается)"
+        echo "  502 - Bad Gateway (Ошибка шлюза)"
+        echo "  503 - Service Unavailable (Сервис временно недоступен)"
+        echo ""
+        echo "Список запросов с ошибками:"
+        echo ""
+        
+        
+        for file in $log_files; do
+            awk -F ' - ' '$5 ~ /^[45][0-9][0-9]$/' "$file"
+        done | while read line; do
+            print_log_entry "$line"
+        done
+        
+        error_count=0
+        for file in $log_files; do
+            file_errors=$(awk -F ' - ' '$5 ~ /^[45][0-9][0-9]$/' "$file" | wc -l)
+            error_count=$((error_count + file_errors))
+        done
+        echo ""
+        echo "Всего запросов с ошибками: $error_count"
+        ;;
+        
+    4)
+        
+        echo "=== Уникальные IP с ошибочными запросами ==="
+        echo ""
+        
+        
+        error_logs=$(mktemp)
+        for file in $log_files; do
+            awk -F ' - ' '$5 ~ /^[45][0-9][0-9]$/' "$file" >> "$error_logs"
+        done
+        
+        
+        awk -F ' - ' '{print $1}' "$error_logs" | sort -t '.' -k1,1n -k2,2n -k3,3n -k4,4n | uniq | while read ip; do
+            
+            error_count=$(grep -c "^$ip - " "$error_logs")
+            
+            
+            total_count=0
+            for file in $log_files; do
+                file_count=$(grep -c "^$ip - " "$file")
+                total_count=$((total_count + file_count))
+            done
+            
+            
+            if [ $total_count -gt 0 ]; then
+                error_percent=$((error_count * 100 / total_count))
+            else
+                error_percent=0
+            fi
+            
+            printf "IP: %-15s | Ошибок: %d/%d (%d%%)\n" "$ip" "$error_count" "$total_count" "$error_percent"
+        done
+        
+        
+        rm -f "$error_logs"
+        
+        error_ip_count=$(for file in $log_files; do
+            awk -F ' - ' '$5 ~ /^[45][0-9][0-9]$/ {print $1}' "$file"
+        done | sort -u | wc -l)
+        
+        echo ""
+        echo "Всего IP с ошибками: $error_ip_count"
+        ;;
+esac

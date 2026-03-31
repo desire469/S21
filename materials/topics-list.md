@@ -5,8 +5,11 @@ To help you navigate through the material, we have prepared a list of topics tha
 We will learn:
 
 - bash scripts;
-- reading information about the system;
-- decorated console output;
-- working with the Linux file system.
+- read information about the system;
+- working with the Linux file system;
+- Grafana;
+- working with logs;
+- Monitoring;
+- Prometheus.
 
 Now that you know what awaits you in this project, you can slowly begin to study the topics listed above. 😇
