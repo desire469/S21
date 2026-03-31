@@ -1,13 +1,16 @@
-Hello, student of School21!😉
+Hello, School21 student! 😉
 
-To make it easier for you to navigate the material, we have prepared a list of topics that you will learn in this project.
+To help you navigate through the material, we have prepared a list of topics that you will learn in this project.
 
-We will study:
+We will learn:
 
-- using command line;
-- configuring OS Linux;
-- superuser rights;
-- installing apps via `apt`;
-- using utils in terminal (top/htop/df/du/ncdu).
+- Routing;
+- TCP/IP;
+- Ports;
+- Firewall (iptables);
+- DHCP;
+- NAT;
+- Using utils in terminal (ipcalc/iperf3);
+- ssh tunnels.
 
-Now, knowing what awaits you in this project, you can slowly begin to study the topics listed above.😇
+Now that you know what to expect in this project, you can slowly start to study the topics listed above. 😇

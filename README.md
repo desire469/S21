@@ -1,350 +1,457 @@
-# UNIX/Linux operating systems (Basic).
+# Linux Network
 
-Linux system installation and updates. Administration basics.
+Linux networks configuration on virtual machines.
 
----
-
->💡 If this is your very first project, fill out this [form](http://opros.so/kAnXy).
-
->💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) to leave your feedback on the project. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
+💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
 ## Contents
 
 1. [Chapter I](#chapter-i)
 2. [Chapter II](#chapter-ii) \
-   2.1. [Linux](#linux)  
-   2.2. [Administration](#administration)  
-   2.3. [Virtual machines](#virtual-machines)
+   2.1. [TCP IP protocol stack](#tcp-ip-protocol-stack) \
+   2.2. [Addressing](#addressing) \
+   2.3. [Routing](#routing)
 3. [Chapter III](#chapter-iii) \
-   3.1 [Installation of the OS](#part-1-installation-of-the-os)  
-   3.2 [Creating a user](#part-2-creating-a-user)  
-   3.3 [Setting up the OS network](#part-3-setting-up-the-os-network)   
-   3.4 [OS Update](#part-4-os-update)  
-   3.5 [Using the sudo command](#part-5-using-the-sudo-command)  
-   3.6 [Installing and configuring the time service](#part-6-installing-and-configuring-the-time-service)  
-   3.7 [Installing and using text editors](#part-7-installing-and-using-text-editors)  
-   3.8 [Installing and basic setup of SSHD service](#part-8-installing-and-basic-setup-of-the-sshd-service)  
-   3.9 [Installing and using the top, htop utilities](#part-9-installing-and-using-the-top-htop-utilities)   
-   3.10 [Using the fdisk utility](#part-10-using-the-fdisk-utility)   
-   3.11 [Using the df utility](#part-11-using-the-df-utility)    
-   3.12 [Using the du utility](#part-12-using-the-du-utility)    
-   3.13 [Installing and using the ncdu utility](#part-13-installing-and-using-the-ncdu-utility)    
-   3.14 [Working with system logs](#part-14-working-with-system-logs)     
-   3.15 [Using the CRON job scheduler](#part-15-using-the-cron-job-scheduler)
+   3.1. [ipcalc tool](#part-1-ipcalc-tool) \
+   3.2. [Static routing between two machines](#part-2-static-routing-between-two-machines) \
+   3.3. [iperf3 utility](#part-3-iperf3-utility) \
+   3.4. [Network firewall](#part-4-network-firewall) \
+   3.5. [Static network routing](#part-5-static-network-routing) \
+   3.6. [Dynamic IP configuration using DHCP](#part-6-dynamic-ip-configuration-using-dhcp) \
+   3.7. [NAT](#part-7-nat) \
+   3.8. [Bonus. Introduction to SSH Tunnels](#part-8-bonus-introduction-to-ssh-tunnels)
+4. [Chapter IV](#chapter-iv)
 
 
 ## Chapter I
 
-![linux](misc/images/linux.png)
+![linux_network](misc/images/linux_network.png)
 
->Developer’s note: \
->For full immersion, you can play your favorite jazz song while reading the assignment.
+Planet Earth, Seb's Jazz Club, nowadays.
 
-Planet Earth, Seb's Jazz Club, today.
+\> *There's a new jazz band playing in the bar. Their jazz is a little more energetic than you're used to, although they're certainly talented.*
 
-"Well, Sebastian, you didn't expect me to believe that you called me just to sit and relax, did you? You're not the type to write to an old comrade in the middle of the working week when you have nothing to say."
+"Sebastian, you have been sitting behind a desk in the office for a week now. Do you think you've learned how to use Linux? But since you called me back in the middle of the week, I think I already know the answer..."
 
-"Nothing can ever be kept from you! I thought I'd get to the point, but since you're so sharp..."
+"I'm slowly getting the hang of it, but obviously not as fast as I'd like."
 
-"Stop flattering me, I'm just wondering why we're here."
+"Are you ready to go to work tomorrow?"
 
-"The thing is, I recently joined a development company that needed an administrator. But there is problem: they use Linux as their operating system."
+"I don't get it, I just don't get it, man. They tell me to work on network configuration. But it's just words to me. I want to meet my young self when I was a stupid kid who took the sysadmin job, talk him out of it, explain what's what, but I can't. What should I do, buddy?"
 
-"And you, as a confident Windows user, want to understand the basics of Linux and also the administration?"
+"Well, come on, don't despair. Configuring networks isn't that bad. I'd be happy to tell you about it if you'd answer one question: why did your dad give you the sysadmin job in the first place? I mean, this is his bar, why not here? It would be an easier job."
 
-"Exactly! As far as I remember, you're good at both."
+"Who knows what's on the old man's mind. He says something about being independent and expanding your mind..."
 
-"Well, then, get your laptop! Obviously I haven't done this for a while, but I'll try to help. The main thing is to finish before the club closes, otherwise we'll have to continue tomorrow."
+"Well, let's expand your minds. Take out your laptop, boot up the virtual machine, I'll show you what's what."
 
-\> *The song ends, the music slowly fades, they bring you the drinks you ordered.*
+\> *The regular band replaces the new one, the music slows down and the waiter still hasn’t brought your order.*
 
-\> *While Sebastian takes his laptop out and turns it on, you decide to share a little historical background.*
+\> *While Sebastian hesitates to start the virtual machine, you decide to share some basic information about networking in Linux.*
 
 
 ## Chapter II
 
-### Linux
+### TCP IP protocol stack
 
-"The history of Linux dates back to 1991, when a Finnish graduate programmer named Linus Torvalds began working on his own operating system kernel.
+What exactly is a network? A network is a connection of at least 2 computers by some kind of communication links or in a more complicated cases, by some networking hardware. The data is exchanged between them according to certain rules, and these rules are "dictated" by the **TCP/IP** protocol stack.
 
-He put his work on a public server and it became a milestone in the history of Linux. First dozens, then hundreds and thousands of developers supported his project, and that's how a complete operating system was born.
+TCP/IP stands for Transmission Control Protocol/Internet Protocol and, to put it simply, is a set of communication protocols of different layers (each layer communicates with its neighbor, i.e. docks, hence the name stack), according to which data is exchanged in a network.
+So, the protocol stack **TCP/IP** is a set of rule sets :) This may raise a fair question: why have so many protocols? Can't everything be exchanged over one protocol?
 
-The first official version, Linux 1.0, was released in 1994. From the beginning to the present day, Linux has been distributed as free software under the GPL licence. This means that the source code of the operating system can be viewed by anyone - and not just viewed, but modified. The only condition is that the modified code must also be available to everyone and distributed under the GPL. This is important because it allows developers to use the code without worrying about copyright issues.
+The thing is that each protocol describes strictly the rules that are allocated to it. Besides, protocols are divided into functionality layers, allowing networking hardware and software to perform much more simply, clearer and to do "their" range of tasks.
+There was developed an **OSI** model (Open Systems Interconnection Basic Reference Model) in 1978 to divide this set of protocols into layers.
+The **OSI** model consists of seven different layers. Each layer is responsible for a specific area in the operation of the communication systems, it does not depend on the layers next to it — it only provides certain services. Each layer performs its task according to a set of rules, called a protocol.
 
-Today, Linux is the most popular and widely used open source operating system. As an operating system, Linux is software that sits below other software on a computer, receiving requests from those programs and passing those requests on to the computer's hardware."
+### Addressing
 
-\> *The waitress brings you the drinks you ordered, the musicians start playing again.*
+In a network based on the **TCP/IP** protocol stack, each host (computer or device connected to the network) has an IP address. IP address is 32-bit number. It is usually represented in dot-decimal notation, consisting of four decimal numbers, each ranging from 0 to 255, separated by dots, e.g., *192.168.0.1*.
+In general, an IP address is divided into two parts: the network (subnet) address and the host address:
 
-### Administration
+![subnetwork_mask](misc/images/subnetwork_mask.png)
 
-"Administration, without going into too much detail, is the support and improvement of all computer and office equipment, peripherals, network connectivity, etc. When administering Linux, most of the work is done in the terminal, so it's better to start with the basic utilities."
+As you can see in the picture, there are such things as network and subnet.
+I think it's clear from the meaning of those words that IP addresses are divided into networks, and networks are divided into subnets using a subnet mask
+(it would be more accurate to say: a host address can be divided into subnets).
 
-\> *At this point Sebastian's laptop boots up and you see a horrible picture: it doesn't even have the right operating system...*
+Apart from the host address in a **TCP/IP** network, there is such a thing as a port. A port is a numerical characteristic of some system resource.
+A port is given to an application running on some network host to communicate with applications running on other network hosts (including other applications on the same host). In software terms, a port is an area of memory that is controlled by a service.
 
-\> *Instead of reinstalling Sebastian's operating system, you decide to use a virtual machine.*
+The IP protocol lies below **TCP** and **UDP** in the protocol hierarchy and is responsible for transmitting and routing information in a network.
+To do this, IP encapsulates each chunk of information (**TCP** or **UDP** packet) in another packet — an IP packet or IP datagram, which stores a header about the source, destination and route.
 
-### Virtual machines
+To draw an analogy with the real world, a **TCP/IP** network is a city. The names of streets and alleys are networks and subnets. The building numbers are the addresses of the hosts.
+In buildings, office/apartment numbers are ports. More precisely, the ports are the mailboxes where the recipients (services) are waiting for their correspondence to arrive. Accordingly, office port numbers 1,2 etc. are usually given to directors and executives, as the privileged ones, and ordinary employees get office numbers with larger numbers. For sending and delivering correspondence, information is packed into envelopes (ip-packets),
+which contain the address of the sender (IP and port) and the address of the recipient (IP and port).
 
-"A virtual machine (VM) is just like a physical computer, it has a CPU, memory, disks for storing files, and can connect to the Internet if necessary. The only difference is that the components of your computer (the hardware) are tangible, while virtual machines exist only as code.
+It must be mentioned that the IP protocol has no notion of ports, **TCP** and **UDP** are responsible for port interpretation, by analogy **TCP** and **UDP** do not process IP addresses.
 
-To put it simply, it's a virtual computer on which you can install an operating system and all the associated software, with no changes to your main operating system.
+### Routing
 
-Virtualisation is the process of creating a software (virtual) version of a computer with dedicated CPU, memory and storage resources that are 'borrowed' from a physical computer. A virtual machine is a computer file (image) that works like a normal computer.
+![network_route](misc/images/network_route.png)
 
-_VirtualBox_ is a virtualisation software product, i.e. a tool for creating virtual machines."
+You may ask, how does one computer connect to another one? How does it know where to send packets?
 
-\> *You wanted to share some more useful information later, so you created a materials folder on Sebastian's laptop with useful information.*
+To resolve this issue, networks are linked by gateways (routers).
+A gateway is the same as a host but with a connection to two or more networks and can transfer information between networks and send packets to another network.
+In the picture the gateway is pineapple and papaya with 2 interfaces each connected to different networks.
+
+IP uses the network part of the address (subnet mask) to determine the route of packets.
+To determine the route, each computer in the network has a routing table that maintains a list of networks and gateways for these networks.
+The IP "reads" the network part of the destination address in a passing packet and if there is an entry in the routing table for that network, the packet is sent to the corresponding gateway.
+
+In Linux, the operating system kernel stores the routing table in the */proc/net/route* file.
+You can view the current routing table with the `netstat -rn` (r — routing table, n — do not convert IP to names) `route` or `ip r` commands.
+
+Here is an example of a routing table for an eggplant host:
+```
+[root@eggplant ~]# netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+128.17.75.0      128.17.75.20   255.255.255.0   UN        1500 0          0 eth0
+default          128.17.75.98   0.0.0.0         UGN       1500 0          0 eth0
+127.0.0.1        127.0.0.1      255.0.0.0       UH        3584 0          0 lo
+128.17.75.20     127.0.0.1      255.255.255.0   UH        3584 0          0 lo
+```
+
+Meanings of the columns:
+- Destination — addresses of destination networks (hosts). If a network is specified, the address usually ends with a zero;
+- Gateway — the gateway address for the host/network specified in the first column; The third column is the subnet mask for which this route works;
+- Flags — information about destination address (U — route works, N — route for network, H — route for host, etc.);
+- MSS — number of bytes that can be sent at one time;
+- Window — number of frames that can be sent before confirmation is received;
+- irtt — route usage statistics;
+- Iface — specifies the network interface used for the route (eth0, eth1, etc.).
+
+\> *As last time, you save even more useful information in the materials folder.*
 
 
 ## Chapter III
 
-As a result of the work you should provide a report with completed tasks. Each part of the task describe what should be added to the report once it has been completed. This can be screenshots, some data, etc.
-
+As a result of the work you should provide a report with completed tasks. Each part of the task describe what should be added to the report once it has been completed. This can be answers to questions, screenshots, etc.
 - A report with a .md extension must be uploaded to the repository, in the src folder;
-- All parts of the task should be highlighted in the report as level 2 headers;
+- All parts of the task should be highlighted in the report as level 2 headings;
 - Within one part of the task, everything that is added to the report must be in the form of the list;
 - Each screenshot in the report must be briefly captioned (what’s in the screenshot);
-- All screenshots must be cropped so that only the relevant part of the screen is shown.
+- All screenshots must be cropped so that only the relevant part of the screen is shown;
+- It’s allowed to have several task points shown in one screenshot, but they must all be described in the caption;
+- Install **Ubuntu 20.04 Server LTS** on all virtual machines created during the task.
 
-## Part 1. Installation of the OS
+List of utilities: `ipcalc`, `ip`, `netplan`, `netstat`, `iperf3`, `iptables`, `ping`, `nmap`, `sysctl`, `tcpdump`, `traceroute`, `systemctl`, `telnet`, `dhclient`, `isc-dhcp-server`, `apache2`.
 
-"Well, let's finally get this Linux installed, Sebastian moves the laptop closer to you."
+## Part 1. **ipcalc** tool
 
-"Yes, it's about time. I saw a great instruction on *Linuxconfig* to install the version we need."
-
-**== Task ==**
-
-##### Install **Ubuntu 20.04 Server LTS** without GUI. (Use VirtualBox).
-- There should be no GUI.
-- Check Ubuntu version by running the command \
-  `cat /etc/issue`
-- Add a screenshot of the command output to the report.
-
-## Part 2. Creating a user
-
-"An installed system is a good thing, but what if someone else uses it? I'll teach you how to create a new user."
+"So, let's start our dive into the wonderful world of networks by getting to know IP addresses. And for that we will use **ipcalc** tool."
 
 **== Task ==**
 
-##### Create a user other than the one created during installation. The user must be added to `adm` group.
-- Add a screenshot of command call to create user.
-- The new user must be in the output of the command: \
-  `cat /etc/passwd`
-- Add a screenshot of the command output.
+##### Start a virtual machine (hereafter -- ws1)
 
-## Part 3. Setting up the OS network
+#### 1.1. Networks and Masks
+##### Define and write in the report:
+##### 1) network address of *192.167.38.54/13*
+##### 2) conversion of the mask *255.255.255.0* to prefix and binary, */15* to normal and binary, *11111111.11111111.11111111.11110000* to normal and prefix
+##### 3) minimum and maximum host in *12.167.38.4* network with masks: */8*, *11111111.11111111.00000000.00000000*, *255.255.254.0* and */4*
 
-"In our world, you can't go far without the Internet. However, since we want to train you for the role of a system administrator, I'll show you a little more than just setting up a network."
+#### 1.2. localhost
+##### Define and write in the report whether an application running on localhost can be accessed with the following IPs: *194.34.23.100*, *127.0.0.2*, *127.1.0.1*, *128.0.0.1*
 
-"Before we begin, I suggest reading about network interfaces and DHCP."
+#### 1.3. Network ranges and segments
+##### Define and write in a report:
+##### 1) which of the listed IPs can be used as public and which only as private: *10.0.0.45*, *134.43.0.2*, *192.168.4.2*, *172.20.250.4*, *172.0.2.1*, *192.172.0.1*, *172.68.0.2*, *172.16.255.255*, *10.10.10.10*, *192.169.168.1*
+##### 2) which of the listed gateway IP addresses are possible for *10.10.0.0/18* network: *10.0.0.1*, *10.10.0.2*, *10.10.10.10*, *10.10.100.1*, *10.10.1.255*
 
-**== Task ==**
+## Part 2. Static routing between two machines
 
-##### Set the machine name as user-1
-##### Set the time zone corresponding to your current location.
-
-##### Output the names of the network interfaces using a console command.
-- In the report give an explanation for the presence of the lo interface.
-##### Use the console command to get the ip address of the device you are working on from the DHCP server.
-- Decode DHCP in the report.
-##### Define and display the external ip address of the gateway (ip) and the internal IP address of the gateway, aka default ip address (gw).
-##### Set static (manually set, not received from DHCP server) ip, gw, dns settings (use public DNS servers, e.g. 1.1.1.1 or 8.8.8.8).
-
-##### Reboot the virtual machine. Make sure that the static network settings (ip, gw, dns) correspond to those set in the previous point.
-- Describe in the report what you have done to complete all seven points (you can do it in text or with screenshots);
-- Successfully ping 1.1.1.1 and ya.ru remote hosts and add a screenshot of the output command to the report. There should be "0% packet loss" phrase in command output.
-
-## Part 4. OS Update
-
-"You're probably wondering, 'Is the system ready now?' It's not ready at all! We haven't updated it to the latest version yet."
+"Now let's figure out how to connect two machines using static routing."
 
 **== Task ==**
 
-##### Update the system packages to the latest version
-- After updating the system packages, if you enter the update command again, a message should appear saying there are no updates;
-- Add a screenshot of this message to the report.
+##### Start two virtual machines (hereafter -- ws1 and ws2)
 
-## Part 5. Using the **sudo** command
+##### View existing network interfaces with the `ip a` command
+- Add a screenshot with the call and output of the used command to the report.
+##### Describe the network interface corresponding to the internal network on both machines and set the following addresses and masks: ws1 — *192.168.100.10*, mask */16 *, ws2 — *172.24.116.8*, mask */12*
+- Add screenshots of the changed *etc/netplan/00-installer-config.yaml* file for each machine to the report.
+##### Run the `netplan apply` command to restart the network service
+- Add a screenshot with the call and output of the used command to the report.
 
-"How often were you told as a child that you forgot to say the 'magic' word? One of those 'magic' words was 'please'. Linux has its counterpart – _sudo_. The system won't perform some operations until it hears the 'magic' word."
+#### 2.1. Adding a static route manually
+##### Add a static route from one machine to another and back using a
+`ip r add` command.
+##### Ping the connection between the machines
+- Add a screenshot with the call and output of the used commands to the report.
 
-**== Task ==**
+#### 2.2. Adding a static route with saving
+##### Restart the machines
+##### Add static route from one machine to another using */etc/netplan/00-installer-config.yaml* file
+- Add screenshots of the changed */etc/netplan/00-installer-config.yaml*
+  file to the report.
+##### Ping the connection between the machines
+- Add a screenshot with the call and output of the used command to the report.
 
-##### Allow user created in [Part 2](#part-2-creating-a-user) to execute sudo command.
-- In the report explain the *true* purpose of sudo command (don’t write about the fact that this word is "magic" one);
-- Change the OS hostname via the user created in [Part 2](#part-2-creating-a-user) (using sudo);
-- Add screenshot with changed hostname to the report.
+## Part 3. **iperf3** utility
 
-## Part 6. Installing and configuring the time service
+"Now that we have linked two machines, tell me: what is the most important thing about transferring information between machines?"
 
-"Although we have the correct time now, it may not always be that way. To avoid having to set it every time yourself, there are time sync services."
+"The connection speed?"
 
-**== Task ==**
-
-##### Set up the automatic time synchronisation service.
-- Output the time of the time zone in which you are currently located.
-- The output of the following command must contain `NTPSynchronized=yes`: \
-  `timedatectl show`
-- Add screenshots of the correct time and command output to the report.
-
-## Part 7. Installing and using text editors
-
-"I think we're ready to move on to one of the scariest parts."
-
-You’re pointing toward the Netherlands on the map of the world hanging on the wall.
-
-"Here, Bram Moolenaar has unraveled the mysteries of harmony and inner concentration. \
-This is where the first version of VIM was released on 2 November 1991. \
-Do you want to learn how to work in VIM?"
-
-"Yes..."
-
-"Then I am your master."
-
-"OK..."
-
-"Just don't cry."
-
-"I won’t..."
+"That's right. We’ll check it with **iperf3** utility."
 
 **== Task ==**
 
-##### Install **VIM** text editor (+ any two others if you like **NANO**, **MCEDIT**, **JOE** etc.)
+* In this task you need to use ws1 and ws2 from *Part 2*.
 
-##### Using each of the three selected editors, create a *test_X.txt* file, where X is the name of the editor in which the file is created. Write your nickname in it, close the file and save the changes.
-- Add screenshots to the report:
-    - Of each editor with the contents of the file before closing;
-- Write down in the report what you have done to exit with the changes saved.
+#### 3.1. Connection speed
+##### Convert and write results in the report: 8 Mbps to MB/s, 100 MB/s to Kbps, 1 Gbps to Mbps
 
-##### Using each of the three selected editors, open the file for editing, edit the file by replacing the nickname with the "21 School 21" string, close the file without saving the changes.
-- Add screenshots to the report:
-    - Of each editor with the contents of the file after editing;
-- Write down in the report what you have done to exit without saving the changes.
-##### Using each of the three selected editors, edit the file again (similar to the previous point) and then master the functions of searching through the contents of a file (a word) and replacing a word with any other one.
-- Add screenshots to the report:
-    - Of each editor with word search results;
-    - Of each editor with commands entered to replace a word with another.
+#### 3.2. **iperf3** utility
+##### Measure connection speed between ws1 and ws2
+- Add a screenshots with the call and output of the used commands to the report.
 
-## Part 8. Installing and basic setup of the **SSHD** service
+## Part 4. Network firewall
 
-"It's convenient to have access from one computer to another over a network, isn't it? But to make it not only convenient, but also safe, you should use SSH service."
+"After connecting the machines, the next our task is to control the information flowing over the connection. For that we use firewalls."
 
 **== Task ==**
 
-##### Install the SSHd service.
-##### Add an auto-start of the service whenever the system boots.
-##### Reset the SSHd service to port 2022.
-##### Show the presence of the sshd process using the ps command. To do this, you need to match the keys to the command.
-- Explain in the report the meaning of the command and each key in it.
-##### Reboot the system.
-- Describe in the report what you have done to complete all five points (you can do this in text or with screenshots);
-- The output of the netstat -tan command should contain \
-  `tcp 0 0.0.0.0:2022 0.0.0.0:* LISTEN` \
-  (if there is no netstat command, it needs to be installed);
-- Add a screenshot of the command output to the report;
-- Explain the meaning of the -tan keys, the value of each output column, the value 0.0.0.0. in the report.
+* In this task you need to use ws1 and ws2 from *Part 2*.
 
-## Part 9. Installing and using the **top**, **htop** utilities
+#### 4.1. **iptables** utility
+##### Create a */etc/firewall.sh* file simulating the firewall on ws1 and ws2:
+```shell
+#!/bin/sh
 
-"If I were asked what useful things **top** and **htop** utilities do, I would answer in one word: everything."
+# Deleting all the rules in the "filter" table (default).
+iptables -F
+iptables -X
+```
+##### The following rules should be added to the file in a row:
+##### 1) on ws1 apply a strategy where a deny rule is written at the beginning and an allow rule is written at the end (this applies to points 4 and 5);
+##### 2) on ws2 apply a strategy where an allow rule is written at the beginning and a deny rule is written at the end (this applies to points 4 and 5);
+##### 3) open access on machines for port 22 (ssh) and port 80 (http);
+##### 4) reject *echo reply* (machine must not ping, i.e. there must be a lock on OUTPUT);
+##### 5) allow *echo reply* (machine must be pinged);
+- Add screenshots of the */etc/firewall* file for each machine to the report.
+##### Run the files on both machines with `chmod +x /etc/firewall.sh` and `/etc/firewall.sh` commands.
+- Add screenshots of both files running to the report;
+- Describe in the report the difference between the strategies used in the first and second files.
 
-**== Task ==**
+#### 4.2. **nmap** utility
+##### Use **ping** command to find a machine which is not pinged, then use **nmap** utility to show that the machine host is up
+*Check: nmap output should say: `Host is up`*.
+- Add screenshots with the call and output of the **ping** and **nmap** commands to the report.
 
-##### Install and run the top and htop utilities.
-- From the output of the top command determine and write in the report:
-    - uptime
-    - number of authorised users
-    - average system load
-    - total number of processes
-    - cpu load
-    - memory load
-    - pid of the process with the highest memory usage
-    - pid of the process taking the most CPU time
-- Add a screenshot of the htop command output to the report:
-    - sorted by PID, PERCENT_CPU, PERCENT_MEM, TIME
-    - filtered for sshd process
-    - with the syslog process found by searching
-    - with hostname, clock and uptime output added
+##### Save dumps of the virtual machine images
+**P.S. Do not upload dumps to git under any circumstances!**
 
-## Part 10. Using the **fdisk** utility
 
-"Now let's figure out how to get information about your hard disk. Especially for you I've put together a couple of examples of how to use the fdisk utility."
+## Part 5. Static network routing
+
+"So far we have only connected two machines, but now it's time for static routing of the whole network."
 
 **== Task ==**
 
-##### Run the fdisk -l command.
-- In the report write the name of the hard disk, its capacity and number of sectors, and also the swap size.
+Network: \
+![part5_network](misc/images/part5_network.png)
 
-## Part 11. Using the **df** utility
+##### Start five virtual machines (3 workstations (ws11, ws21, ws22) and 2 routers (r1, r2))
 
-"We got the information about the hard disk, but often it is much more interesting to get information about the disk space, which can be obtained with the df utility."
+#### 5.1. Configuration of machine addresses
+##### Set up the machine configurations in *etc/netplan/00-installer-config.yaml* according to the network in the picture.
+- Add screenshots of the *etc/netplan/00-installer-config.yaml* file for each machine to the report.
+##### Restart the network service. If there are no errors, check that the machine address is correct with the `ip -4 a`command. Also ping ws22 from ws21. Similarly ping r1 from ws11.
+- Add screenshots with the call and output of the used commands to the report.
+
+#### 5.2. Enabling IP forwarding.
+##### To enable IP forwarding, run the following command on the routers:
+`sysctl -w net.ipv4.ip_forward=1`.
+
+*With this approach, the forwarding will not work after the system is rebooted.*
+- Add a screenshot with the call and output of the used command to the report.
+
+##### Open */etc/sysctl.conf* file and add the following line:
+`net.ipv4.ip_forward = 1`
+*With this approach, IP forwarding is enabled permanently.*
+- Add a screenshot of the changed */etc/sysctl.conf* file to the report.
+
+#### 5.3. Default route configuration
+Here is an example of the `ip r' command output after adding a gateway:
+```
+default via 10.10.0.1 dev eth0
+10.10.0.0/18 dev eth0 proto kernel scope link src 10.10.0.2
+```
+
+##### Configure the default route (gateway) for the workstations. To do this, add `default` before the router's IP in the configuration file
+- Add a screenshot of the *etc/netplan/00-installer-config.yaml* file to the report.
+##### Call `ip r` and show that a route is added to the routing table
+- Add a screenshot with the call and output of the used command to the report.
+##### Ping r2 router from ws11 and show on r2 that the ping is reaching. To do this, use the `tcpdump -tn -i eth0`
+command.
+- Add screenshots with the call and output of the used commands to the report.
+
+#### 5.4. Adding static routes
+##### Add static routes to r1 and r2 in configuration file. Here is an example for r1 route to 10.20.0.0/26:
+```shell
+# Add description to the end of the eth1 network interface:
+- to: 10.20.0.0
+  via: 10.100.0.12
+```
+
+- Add screenshots of the changed *etc/netplan/00-installer-config.yaml* file for each router to the report.
+
+##### Call `ip r` and show route tables on both routers. Here is an example of the r1 table:
+```
+10.100.0.0/16 dev eth1 proto kernel scope link src 10.100.0.11
+10.20.0.0/26 via 10.100.0.12 dev eth1
+10.10.0.0/18 dev eth0 proto kernel scope link src 10.10.0.1
+```
+- Add a screenshot with the call and output of the used command to the report.
+##### Run `ip r list 10.10.0.0/[netmask]` and `ip r list 0.0.0.0/0` commands on ws11.
+- Add a screenshot with the call and the output of the used commands to the report.
+- Explain in the report why a different route other than 0.0.0.0/0 had been selected for 10.10.0.0/\[netmask\] although it could be the default route.
+
+#### 5.5. Making a router list
+Here is an example of the **traceroute** utility output after adding a gateway:
+```
+1 10.10.0.1 0 ms 1 ms 0 ms
+2 10.100.0.12 1 ms 0 ms 1 ms
+3 10.20.0.10 12 ms 1 ms 3 ms
+```
+##### Run the `tcpdump -tnv -i eth0` dump command on r1
+##### Use **traceroute** utility to list routers in the path from ws11 to ws21
+- Add a screenshots with the call and the output of the used commands (tcpdump and traceroute) to the report;
+- Based on the output of the dump on r1, explain in the report how path construction works using **traceroute**.
+
+#### 5.6. Using **ICMP** protocol in routing
+##### Run on r1 network traffic capture going through eth0 with the
+`tcpdump -n -i eth0 icmp` command.
+
+##### Ping a non-existent IP (e.g. *10.30.0.111*) from ws11 with the
+`ping -c 1 10.30.0.111` command.
+- Add a screenshot with the call and the output of the used commands to the report.
+
+##### Save dumps of the virtual machine images
+**P.S. Do not upload dumps to git under any circumstances!**
+
+## Part 6. Dynamic IP configuration using **DHCP**
+
+"Our next step is to learn more about **DHCP** service, which you already know."
 
 **== Task ==**
 
-##### Run the df command.
-- In the report write for the root partition (/):
-    - partition size
-    - space used
-    - space free
-    - percentage used
-- Determine and write the measurement unit in the report.
+*In this task you need to use virtual machines from Part 5.*
 
-##### Run the df -Th command.
-- In the report write for the root partition (/):
-    - partition size
-    - space used
-    - space free
-    - percentage used
-- Determine and write the file system type for the partition in the report.
+##### For r2, configure the **DHCP** service in the */etc/dhcp/dhcpd.conf* file:
 
-## Part 12. Using the **du** utility
+##### 1) Specify the default router address, DNS-server and internal network address. Here is an example of a file for r2:
+```shell
+subnet 10.100.0.0 netmask 255.255.0.0 {}
 
-"df is not the only way to get information about disk space. I'll tell you about another one."
+subnet 10.20.0.0 netmask 255.255.255.192
+{
+    range 10.20.0.2 10.20.0.50;
+    option routers 10.20.0.1;
+    option domain-name-servers 10.20.0.1;
+}
+```
+##### 2) Write `nameserver 8.8.8.8` in a *resolv.conf* file
+- Add screenshots of the changed files to the report.
+##### Restart the **DHCP** service with `systemctl restart isc-dhcp-server`. Reboot the ws21 machine with `reboot` and show with `ip a` that it has got an address. Also ping ws22 from ws21.
+- Add a screenshot with the call and the output of the used commands to the report.
 
-**== Task ==**
+##### Specify MAC address at ws11 by adding to *etc/netplan/00-installer-config.yaml*:
+`macaddress: 10:10:10:10:10:BA`, `dhcp4: true`
+- Add a screenshot of the changed *etc/netplan/00-installer-config.yaml* file to the report.
+##### Сonfigure r1 the same way as r2, but make the assignment of addresses strictly linked to the MAC-address (ws11). Run the same tests
+- Describe this part in the report the same way as for r2.
+##### Request IP address update from ws21
+- Add screenshots of IP before and after update to the report;
+- Describe in the report what **DHCP** server options were used in this point.
 
-##### Run the du command.
-##### Output the size of the /home, /var, /var/log folders (in bytes, in human readable format)
-##### Output the size of all contents in /var/log (not the total, but each nested element using *)
-- Add screenshots with the output of all used commands to the report.
+##### Save dumps of virtual machine images
+**P.S. Do not upload dumps to git under any circumstances!**
 
-## Part 13. Installing and using the **ncdu** utility
+## Part 7. **NAT**
 
-"You probably didn’t like much the format in which the du command outputs information. I understand you perfectly. So now we'll take a look at its improved version."
-
-**== Task ==**
-
-##### Install the ncdu utility.
-##### Output the size of the /home, /var, /var/log folders.
-- The size should be approximately the same as in [Part 12](#part-12-using-the-du-utility);
-
-- Add screenshots of the used commands to the report.
-
-## Part 14. Working with system logs
-
-"A system administrator sometimes needs to review events which happened in a system in the recent past. Linux has system logs for that."
+"And finally, the cherry on the cake, let me tell you about network address translation mechanism."
 
 **== Task ==**
 
-##### Open for viewing:
-##### 1. /var/log/dmesg
-##### 2. /var/log/syslog
-##### 3. /var/log/auth.log
-- Write the last successful login time, user name and login method in the report;
-- Restart SSHd service;
-- Add a screenshot of the service restart message to the report (search for it in the logs).
+*In this task you need to use virtual machines from Part 5*
 
-## Part 15. Using the **CRON** job scheduler
+##### In */etc/apache2/ports.conf* file change the line `Listen 80` to `Listen 0.0.0.0:80`on ws22 and r1, i.e. make the Apache2 server public
+- Add a screenshot of the changed file to the report
+##### Start the Apache web server with `service apache2 start` command on ws22 and r1
+- Add screenshots with the call and the output of the used command to the report.
 
-"Phew, we finally got to the last part of my long narrative. I will now show you the program, which, among other things, noticeably simplifies the periodic invocation of other programs."
+##### Add the following rules to the firewall, created similarly to the firewall from Part 4, on r2:
+##### 1) delete rules in the filter table — `iptables -F`
+##### 2) delete rules in the "NAT" table — `iptables -F -t nat`
+##### 3) drop all routed packets — `iptables --policy FORWARD DROP`
+##### Run the file as in Part 4
+##### Check the connection between ws22 and r1 with the `ping` command
+*When running the file with these rules, ws22 should not ping from r1*
+- Add screenshots with the call and the output of the used command to the report.
+##### Add another rule to the file:
+##### 4) allow routing of all **ICMP** protocol packets
+##### Run the file as in Part 4
+##### Check connection between ws22 and r1 with the `ping` command
+*When running the file with these rules, ws22 should ping from r1*
+- Add screenshots with the call and the output of the used command to the report.
+##### Add two more rules to the file:
+##### 5) enable **SNAT**, which is masquerade all local IP from the local network behind r2 (as defined in Part 5 — network 10.20.0.0)
+*Tip: it is worth thinking about routing internal packets as well as external packets with an established connection*
+##### 6) enable **DNAT** on port 8080 of r2 machine and add external network access to the Apache web server running on ws22
+*Tip: be aware that when you will try to connect, there will be a new tcp connection for ws22 and port 80
+- Add a screenshot of the changed file to the report
+##### Run the file as in Part 4
+*Before testing it is recommended to disable the **NAT** network interface in VirtualBox (its presence can be checked with `ip a` command), if it is enabled*
+##### Check the TCP connection for **SNAT** by connecting from ws22 to the Apache server on r1 with the `telnet [address] [port]` command
+##### Check the TCP connection for **DNAT** by connecting from r1 to the Apache server on ws22 with the `telnet` command (address r2 and port 8080)
+- Add screenshots with the call and the output of the used commands to the report.
+
+##### Save dumps of virtual machine images
+**P.S. Do not upload dumps to git under any circumstances!**
+
+## Part 8. Bonus. Introduction to **SSH Tunnels**
+
+"Well, that'll be all for now. Do you have any other questions?"
+
+"Yes, I wanted to ask about one more thing. When I was at work, I overheard that there are some kind of training projects in my company. I don't know the details, but I'd really like to take a look... It might be useful."
+
+"Yes, it's really interesting, but how can I help you with that?"
+
+"The problem is that you need to have an access to a closed network to get to these projects. Can you give me any advice on that?"
+
+"Wow, that’s really something… I'm not sure how much help this will be, but I can tell you about **SSH Tunnels**."
 
 **== Task ==**
 
-##### Using the job scheduler, run the uptime command in every 2 minutes.
-- Find lines in the system logs (at least two within a given time range) about the execution;
-- Display a list of current jobs for CRON;
-- Add screenshots of the execution lines and the list of current tasks to the report.
+*In this task you need to use virtual machines from Part 5.*
 
-##### Remove all tasks from the job scheduler.
-- Add a screenshot of the list of current tasks for CRON to the report.
+##### Run a firewall on r2 with the rules from Part 7
+##### Start the **Apapche** web server on ws22 on localhost only (i.e. in */etc/apache2/ports.conf* file change the line `Listen 80` to `Listen localhost:80`)
+##### Use *Local TCP forwarding* from ws21 to ws22 to access the web server on ws22 from ws21
+##### Use *Remote TCP forwarding* from ws11 to ws22 to access the web server on ws22 from ws11
+##### To check if the connection worked in both of the previous steps, go to a second terminal (e.g. with the Alt + F2) and run the `telnet 127.0.0.1 [local port]` command.
+- In the report, describe the commands that you need for doing these 4 steps and add screenshots of their call and output.
 
+##### Save dumps of virtual machine images
+**P.S. Do not upload dumps to git under any circumstances!**
+
+## Chapter IV
+
+"Thank you so much for the help!"
+
+"You’re welcome! It was good for me to remember the basics of administration too. By the way, I’ve decided to go into DevOps."
+
+"Wow! Have you already found a job?"
+
+"Yes, but I’ll have to move. So, next time you'll have to learn everything on your own."
+
+"Sooner or later I'd have to start anyway, so maybe it's for the best. Stay in touch to tell me about how you’re getting on!"
+
+"You too!"
+
+\> *You talk about other things for a while, listening to some nice music and finishing your drinks, and then you say goodbye...*

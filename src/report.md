@@ -1,362 +1,474 @@
-## Part 1. Установка ОС
+## Part 1. Инструмент ipcalc
 
-- Версия убунты:
+### 1.1. Сети и маски
 
-   ![UbuntuVersion](./Screenshots/UbuntuVersion.png)
+#### Адрес сети 192.167.38.54/13
 
-## Part 2. Создание пользователя
+ ![Адрес сети 192.167.38.54/13](./images/Part1/1.1/1.1.1/1.1.1.png)
 
-- Команда для создания нового пользователя:
+- Адрес сети 192.167.38.54/13
 
-   ![passwd](./Screenshots/newUser.png)
+#### Перевод маски 255.255.255.0 в префиксную и двоичную запись, /15 в обычную и двоичную, 11111111.11111111.11111111.11110000 в обычную и префиксную
 
+ ![Маска 255.255.255.0 в префиксной и двоичной записи](./images/Part1/1.1/1.1.2/1.1.2.1.png)
 
-- Вывод команды  ```cat /ect/passwd```
+- Маска 255.255.255.0 в префиксной и двоичной записи. В профиксной записи = /24
+---
 
-   ![passwd](./Screenshots/passwd.png)
-- Группы нового пользователя:
+ ![Маска 255.255.255.0 в префиксной и двоичной записи](./images/Part1/1.1/1.1.2/1.1.2.2.png)
 
-   ![groups](./Screenshots/groups.png)
+- Маска /15 в обычной и двоичной записи
+---
 
-## Part 3. Настройка сети ОС
+ ![Маска 255.255.255.0 в префиксной и двоичной записи](./images/Part1/1.1/1.1.2/1.1.2.3.png)
 
-- Для переименования имени машины я использовал следующую команду: 
+- Маска 11111111.11111111.11111111.11110000 в префиксной и обычной записи. Так как ipconf не поддерживает бинарный ввод, переведем бинарный формат в десятичный. Получим: 255.255.255.240. В префиксной форме: /28
 
-   ```sudo hostnamectl set-hostname user-1```
+#### Минимальный и максимальный хост в сети 12.167.38.4 при масках: /8, 11111111.11111111.00000000.00000000, 255.255.254.0 и /4
 
-   ![machineRename](./Screenshots/machineRename.png)
+ ![Минимальный и максимальный хост в сети 12.167.38.4 при маскe /8](./images/Part1/1.1/1.1.3/1.1.3.1.png)
 
+- Минимальный и максимальный хост в сети 12.167.38.4 при маскe /8. HostMin: 12.0.0.1, HostMax: 12.255.255.254
+---
 
-- Для времени:
+ ![Минимальный и максимальный хост в сети 12.167.38.4 при маскe 11111111.11111111.00000000.00000000](./images/Part1/1.1/1.1.3/1.1.3.2.png)
 
-   ```sudo timedatectl set-timezone Europe/Moscow```
+- Минимальный и максимальный хост в сети 12.167.38.4 при маскe 11111111.11111111.00000000.00000000. Переведем маску в префиксный вид, получив /16. HostMin: 12.167.0.1, HostMax:12.167.255.254
+---
 
-   Позволяет установить часовой пояс для машины в формате задачи Регион/Город
+ ![Минимальный и максимальный хост в сети 12.167.38.4 при маскe 255.255.254.0](./images/Part1/1.1/1.1.3/1.1.3.3.png)
 
-   ![newTimezone](./Screenshots/newTimezone.png)
+- Минимальный и максимальный хост в сети 12.167.38.4 при маскe 255.255.254.0. Переведем маску в префиксный формат: /23. HostMin: 12.167.38.1, HostMax: 12.167.39.254
+---
 
+ ![Минимальный и максимальный хост в сети 12.167.38.4 при маскe /4](./images/Part1/1.1/1.1.3/1.1.3.4.png)
 
-- Сетевые интерфейсы машины:
+- Минимальный и максимальный хост в сети 12.167.38.4 при маскe /4. HostMin: 0.0.0.1, HostMax: 15.255.255.254
 
-   ![networkInterfaces](./Screenshots/networkInterfaces.png)
+### 1.2 localhost
+- Определи и запиши в отчёт, можно ли обратиться к приложению, работающему на localhost, со следующими IP: 194.34.23.100, 127.0.0.2, 127.1.0.1, 128.0.0.1
 
-- Io интерфейс необходим для налаживания работы устройства с вводом и выводом данных в и из сети Например, получение данных с сервера или отправление данных на сервер,
+ ![194.34.23.100, 127.0.0.2](./images/Part1/1.2/1.2.1.png)
 
-- IP от DHCP:
+- 194.34.23.100 - нельзя, так как отсутствует пометка Loopback; 127.0.0.2 - можно, пометка Loopback присутствует.
+---
 
-   ![internal IP from DHCP](./Screenshots/internalIP.png)
+ ![127.1.0.1, 128.0.0.1](./images/Part1/1.2/1.2.2.png)
 
-- Dynamic Host Configuration Protocol - протокол для автоматического назначения IP-адресса и других параметров устройствам в сети.
+- 127.1.0.1 - можно, пометка Loopback присутствует; 128.0.0.1 - нельзя, так как отсутствует пометка Loopback.
 
-- Внутренний и внешний IP адресса соответственно:
+### 1.3 Диапазоны и сегменты сетей 
 
-   ![Internal IP](./Screenshots/internalIP.png)
+##### Какие из перечисленных IP можно использовать в качестве публичного, а какие только в качестве частных: 10.0.0.45, 134.43.0.2, 192.168.4.2, 172.20.250.4, 172.0.2.1, 192.172.0.1, 172.68.0.2, 172.16.255.255, 10.10.10.10, 192.169.168.1
 
-   ![External IP](./Screenshots/externalIP.png)
+ ![10.0.0.45, 134.43.0.2, 192.168.4.2](./images/Part1/1.3/1.3.1/1.png)
 
-- Для задания статичного айпи-адресса машине я изменял netplan самой машины: 
+- 10.0.0.45 - Частный, 134.43.0.2 - Публичный (Отсутствует пометка Private Internet), 192.168.4.2 - Частный
+---
+ ![172.20.250.4, 172.0.2.1, 192.172.0.1](./images/Part1/1.3/1.3.1/2.png)
 
-   ![EditingIPs](./Screenshots/editingIPs.png)
+- 172.20.250.4 - Частный, 172.0.2.1 - Публичный, 192.172.0.1 - Публичный
+---
 
-- После изменения и перезапуска машины:
+ ![172.68.0.2, 172.16.255.255, 10.10.10.10](./images/Part1/1.3/1.3.1/3.png)
 
-   ![Internal IP after edit](./Screenshots/internalIPafterEdit.png)
+- 172.68.0.2 - Публичный, 172.16.255.255 - Частный, 10.10.10.10 - Частный
+---
 
-- Результаты пингования:
+ ![192.169.168.1](./images/Part1/1.3/1.3.1/4.png)
 
-   1.1.1.1
+- 192.169.168.1 - Публичный
 
-   ![Pinging 1.1.1.1](./Screenshots/pinging1.1.1.1.png)
+##### Какие из перечисленных IP-адресов шлюза возможны у сети 10.10.0.0/18: 10.0.0.1, 10.10.0.2, 10.10.10.10, 10.10.100.1, 10.10.1.255
 
-   ya.ru
+ ![Диапазон допустимых адресов для 10.10.0.0/18](./images/Part1/1.3/1.3.2/1.png)
 
-   ![Pinging ya.ru](./Screenshots/pingingYa.ru.png)
+ - Диапазон допустимых адресов: HostMin: 10.10.0.1, HostMax: 10.10.63.254. Адреса должны входить в этот диапазон, из этого делаем вывод:
+   - 10.0.0.1 - Неподходит
+   - 10.10.0.2 - Подходит
+   - 10.10.10.10 - Подходит
+   - 10.10.100.1 - Неподходит
+   - 10.10.1.255 - Неподходит
 
-## Part 4. Обновление ОС
+## Part 2. Статическая маршрутизация между двумя машинами
+- Подними две виртуальные машины (далее -- ws1 и ws2).
+- С помощью команды ip a посмотри существующие сетевые интерфейсы.
 
-- Обновление системы:
+ ![ws1](./images/Part2/quest%200/move%201/ws1.png)
 
-   ![Update system](./Screenshots/update.png)
+ ![ws2](./images/Part2/quest%200/move%201/ws2.png)
 
-## Part 5. Использование команды sudo
+- Опиши сетевой интерфейс, соответствующий внутренней сети, на обеих машинах и задай следующие адреса и маски: ws1 — 192.168.100.10, маска /16, ws2 — 172.24.116.8, маска /12.
 
-- Команда sudo позволяет временно получить права администратора для выполнения одной команды.
+ ![ws1](./images/Part2/quest%200/move%202/ws1.png)
 
-- Добавление sudo прав пользователю:
+ ![ws2](./images/Part2/quest%200/move%202/ws2.png)
 
-   ![Adding Sudo To User](./Screenshots/addingSudoToUser.png)
+- Выполни команду netplan apply для перезапуска сервиса сети.
 
-- Переход на нового пользователя:
+ ![ws1](./images/Part2/quest%200/move%203/ws1.png)
 
-   ![Changing To A New User](./Screenshots/changingToANewUser.png)
+ ![ws2](./images/Part2/quest%200/move%203/ws2.png)
 
-- Изменине имени машины через нового пользователя:
+### 2.1. Добавление статического маршрута вручную
+- Добавь статический маршрут от одной машины до другой и обратно при помощи команды вида ip r add.
+- Пропингуй соединение между машинами.
+- Добавляем статический маршрут от машины к машине:
 
-   ![Changing Hostname Via New User](./Screenshots/changingHostnameViaNewUser.png)
+ ![Добавляем статический маршрут от ws1 к ws2](./images/Part2/quest%201/ws1.1.png)
 
-## Part 6. Установка и настройка службы времени
+ ![Добавляем статический маршрут от ws2 к ws1](./images/Part2/quest%201/ws2.1.png)
 
-- Вывод времени в котором я сейчас нахожусь:
+- Пингуем:
 
-   ![Outputing Timezone](./Screenshots/outputingTimezone.png)
+ ![Пингуем ws2](./images/Part2/quest%201/ws1.2.png)
 
-## Part 7. Установка и использование текстовых редакторов
+ ![Пингуем ws1](./images/Part2/quest%201/ws2.2.png)
 
-- VI. Для закрытия ввел команду :wq
+### 2.2. Добавление статического маршрута с сохранением
+- Добавь статический маршрут от одной машины до другой с помощью файла /etc/netplan/00-installer-config.yaml.
+- Измененные netplan'ы машин ws1 и ws2 соответственно:
 
-   ![vi](./Screenshots/vi.png)
+ ![netplan ws1](./images/Part2/quest%202/ws1.1.png)
 
-- NANO. Для закрытия ввел последовательно: 
+ ![netplan ws2](./images/Part2/quest%202/ws2.1.png)
 
-   ```Cmnd+X```
+- Результаты пингования машин:
 
-   ```Y```
+ ![ws1 pinging ws2](./images/Part2/quest%202/ws1.2.png)
 
-   ```Enter```
+ ![ws2 pinging ws1](./images/Part2/quest%202/ws2.2.png)
 
-   ![NANO](./Screenshots/nano.png)
+## Part 3. Утилита iperf3
 
-- MCEdit. Для закрытия нажал fn+F10:
+### 3.1. Скорость соединения
+##### Переведи и запиши в отчёт: 8 Mbps в MB/s, 100 MB/s в Kbps, 1 Gbps в Mbps.
+- 8 Mbps = 1 MB/s
+- 100 MB/s =  819200 Kbps
+- 1 Gbps = 1024 Mbps
+### 3.2. Утилита **iperf3**
+#### Измерь скорость соединения между ws1 и ws2.
+- ws1 в роли сервера, ws2 - в роли клиента:
 
-   ![MCedit](./Screenshots/mcedit.png)
+ ![ws1 server](./images/Part3/Quest2/ws1.png)
 
-- После изменения и выхода без сохранения:
+ ![ws2 client](./images/Part3/Quest2/ws2.png)
 
-- VI. Для закрытия без сохранения ввел команду :q!
 
-   ![Vi w/o save](./Screenshots/ViWoSave.png)
+## Part 4. Сетевой экран
 
-- NANO. Для закрытия ввел последовательно: 
+#### 4.1. Утилита **iptables**
+##### Создай файл */etc/firewall.sh*, имитирующий файрвол, на ws1 и ws2:
+##### Нужно добавить в файл подряд следующие правила:
+##### 1) На ws1 примени стратегию, когда в начале пишется запрещающее правило, а в конце пишется разрешающее правило (это касается пунктов 4 и 5).
+##### 2) На ws2 примени стратегию, когда в начале пишется разрешающее правило, а в конце пишется запрещающее правило (это касается пунктов 4 и 5).
+##### 3) Открой на машинах доступ для порта 22 (ssh) и порта 80 (http).
+##### 4) Запрети *echo reply* (машина не должна «пинговаться», т. е. должна быть блокировка на OUTPUT).
+##### 5) Разреши *echo reply* (машина должна «пинговаться»).
 
-   ```Cmnd+X```
+ ![ws1](./images/Part4/Quest1/ws1.png)
 
-   ```N```
+ ![ws2](./images/Part4/Quest1/ws2.png)
 
-   ```Enter```
-   
-   ![NANO w/o save](./Screenshots/NanoWoSave.png)
+##### Запусти файлы на обеих машинах командами `chmod +x /etc/firewall.sh` и `/etc/firewall.sh`.
 
-- MCEdit. Для закрытия нажал fn+F10 и отказался от сохранения:
+ ![ws1](./images/Part4/Quest1/ws1.2.png)
 
-   ![MC w/o save](./Screenshots/MCWoSave.png)
+ ![ws2](./images/Part4/Quest1/ws2.2.png)
 
-- VI. 
+- Разница в стратегиях в файлах заключается в том, что в первом случае мы перезаписываем запрет разрешением на пинг, а во втором - перезаписываем разрешение запретом.
 
-   Для поиска была введена комада / и после написан искомый текст:
+#### 4.2. Утилита **nmap**
+##### Командой **ping** найди машину, которая не «пингуется», после чего утилитой **nmap** покажи, что хост машины запущен.
 
-   ![Vi Find](./Screenshots/viFind.png)
+ ![ws1](./images/Part4/Quest2/ping.png)
 
-   Для поиска и замены было использована команда \:s/заменяемый текст/заменяющий текст/
+ ![ws2](./images/Part4/Quest2/nmap.png)
 
-   ![Vi Find Replace](./Screenshots/viFindReplace.png)
+## Part 5. Статическая маршрутизация сети
 
-- NANO.
+##### Подними пять виртуальных машин (3 рабочие станции (ws11, ws21, ws22) и 2 роутера (r1, r2)).
 
-   Для поиска была введена комада Crtl+W и после написан искомый текст:
+#### 5.1. Настройка адресов машин
+##### Настрой конфигурации машин в *etc/netplan/00-installer-config.yaml* согласно сети на рисунке.
 
-   ![Nano Find](./Screenshots/nanoFind.png)
+ ![ws11](./images/Part5/Quest1/ws11.png)
 
-   Для поиска и замены было использована команда Ctrl+/ и введено заменяемое слово:
+ ![ws21](./images/Part5/Quest1/ws21.png)
 
-   ![Nano Find Replace](./Screenshots/nanoFindReplace1.png)
-   
-   Ввод заменяющего слова:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace2.png)
-   
-   Результат:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace3.png)
+ ![ws22](./images/Part5/Quest1/ws22.png)
 
-- MCEdit.
+ ![r1](./images/Part5/Quest1/r1.png)
 
-   Для поиска была введена команда fm+F7 и после написан искомый текст:
-   ![NC Find](./Screenshots/MCFind.png)
+ ![r2](./images/Part5/Quest1/r2.png)
 
-   Для поиска и замены было использована команда fn+F4 и введено заменяемое слово:
+##### Перезапусти сервис сети. Если ошибок нет, командой `ip -4 a` проверь, что адрес машины задан верно. Также пропингуй ws22 с ws21. Аналогично пропингуй r1 с ws11.
 
-   ![MC Find Replace](./Screenshots/MCFindReplace.png)
+ ![ws22 c ws21](./images/Part5/Quest1/w21w22.png)
 
-   Выбор заменяемого найденного слова:
+ ![r1 c ws 11](./images/Part5/Quest1/ws11r1.png)
 
-   ![MC Find Replace](./Screenshots/MCFindReplace2.png)
+#### 5.2. Включение переадресации IP-адресов
+##### Для включения переадресации IP выполни команду на роутерах:
+`sysctl -w net.ipv4.ip_forward=1`
 
-   Результат:
+ ![r1 inline](./images/Part5/Quest2/r11.png)
 
-   ![MC Find Replace](./Screenshots/MCFindReplace3.png)
+ ![r2 inline](./images/Part5/Quest2/r21.png)
 
-## Part 8. Установка и базовая настройка сервиса SSHD
-- Установка SSHD происходила по вводу команды:
+##### Открой файл */etc/sysctl.conf* и добавь в него следующую строку:
+`net.ipv4.ip_forward = 1`
 
-   ```sudo apt install openssh-server```
+ ![r1 in file](./images/Part5/Quest2/r12.png)
 
-- Проверка запущенной сервиса SSHd:
+ ![r2 in file](./images/Part5/Quest2/r22.png)
 
-   ![SSH status](./Screenshots/sshStatus.png)
+#### 5.3. Установка маршрута по умолчанию
+Пример вывода команды `ip r` после добавления шлюза:
+```
+default via 10.10.0.1 dev eth0
+10.10.0.0/18 dev eth0 proto kernel scope link src 10.10.0.2
+```
+##### Настрой маршрут по умолчанию (шлюз) для рабочих станций. Для этого добавь `default` перед IP-роутера в файле конфигураций.
 
-- Открытие порта 2022 для SSHd:
+ ![ws11](./images/Part5/Quest3/ws11.png)
 
-   ![SSH allowing 2022](./Screenshots/sshAllowing2022.png)
+ ![ws21](./images/Part5/Quest3/ws21.png)
 
-- Проверяем наличие процесса ssh через ps:
+ ![ws22](./images/Part5/Quest3/ws22.png)
 
-   ![ps SSH](./Screenshots/psSsh.png)
+##### Вызови `ip r` и покажи, что добавился маршрут в таблицу маршрутизации.
 
-- a: Отображает процессы всех пользователей
+ ![ws11](./images/Part5/Quest3/ws11ipr.png)
 
-   u: Использует формат вывода, который включает дополнительные сведения
+ ![ws21](./images/Part5/Quest3/ws21ipr.png)
 
-   x: Показывает все процессы
+ ![ws22](./images/Part5/Quest3/ws22ipr.png)
 
-- Изменение айпи на статический:
+##### Пропингуй с ws11 роутер r2 и покажи на r2, что пинг доходит. Для этого используй команду:
+`tcpdump -tn -i eth0`
 
-   ![SSH file](./Screenshots/sshFile.png)
+ ![ping](./images/Part5/Quest3/ping.png)
 
-- Информация с netstat:
+ ![tcpdump](./images/Part5/Quest3/tcpdump.png)
 
-   ![netstat ssh](./Screenshots/netstatSsh.png)
 
-   Флаг а используется для отображения всех сокетов машины, t - для отображения tcp сокетов, n - отображает IP и номера портов вместо цисловых айдишников.
+#### 5.4. Добавление статических маршрутов
+##### Добавь в роутеры r1 и r2 статические маршруты в файле конфигураций. Пример для r1 маршрута в сетку 10.20.0.0/26:
+```shell
+# Добавь в конец описания сетевого интерфейса eth1:
+- to: 10.20.0.0
+  via: 10.100.0.12
+```
 
-   Столбцы: Proto - протокол, Recv-Q - количество полученных байтов, Send-Q - отправленных, Local Address - локальные айпи с портом процесса,  Foreging Address - внешние айпи с портом процесса, State - статус процесса.
+ ![r1](./images/Part5/Quest4/r1.png)
 
-## Part 9. Установка и использование утилит top, htop
+ ![r2](./images/Part5/Quest4/r2.png)
+##### Вызови `ip r` и покажи таблицы с маршрутами на обоих роутерах. Пример таблицы на r1:
+```
+10.100.0.0/16 dev eth1 proto kernel scope link src 10.100.0.11
+10.20.0.0/26 via 10.100.0.12 dev eth1
+10.10.0.0/18 dev eth0 proto kernel scope link src 10.10.0.1
+```
 
-- Вывод htop:
+ ![r1](./images/Part5/Quest4/ipr1.png)
 
-   ![htop](./Screenshots/htop.png)
-   
-   Столбцы: PID - уникальный айди процесса, USER - пользователь процесса, PRI - приоритет процесса для процессора, NI - уровень "nice" процесса, VIRT - занимаемый обьем виртуальной памяти процесса, RES - занимаемый обьем ОЗУ у процессора, SHR - обьем памяти который может быть разделен с другими процессами, S - статус процесса, CPU% - нагрузка на процессор процессом, MEM% - нагрузка на память процессом, TIME+ - время работы процесса, Command - путь к исходному файлу процесса.
+ ![r2](./images/Part5/Quest4/ipr2.png)
 
-- Сортировка по PID:
+##### Запусти команды на ws11:
+`ip r list 10.10.0.0/[маска сети]` и `ip r list 0.0.0.0/0`
 
-   ![sort By PID](./Screenshots/SortByPID.png)
+ ![ws11 10.10.0.0/18](./images/Part5/Quest4/ws1110.png)
 
-- Сортировка по MEM:
+ ![ws11 0.0.0.0/0](./images/Part5/Quest4/ws110.png)
 
-   ![sort By MEM](./Screenshots/SortByMEM.png)
-
-- Сортировка по CPU:
-
-   ![sort By CPU](./Screenshots/sortByCPU.png)
-
-- Сортировка по TIME:
-
-   ![sort By TIME](./Screenshots/SortByTIME.png)
-
-- Фильтр по sshd:
-
-   ![filter By SSHD](./Screenshots/filetForSSHD.png)
-
-- syslog:
-
-   ![find syslog](./Screenshots/searchForSYSLOG.png)
-
-- hostname, clock, uptime:
-
-   ![htop With HOSTNAME clock UPTIME](./Screenshots/htopWithHOSTNAMEclockUPTIME.png)
-
-## Part 10. Использование утилиты fdisk
-
-- Название диска: /dev/sda
-
-   Размер: 25 гигабайт
-
-   Количество секторов: 52428800
-
-   SWAP: нету в виду отсутствия файла подкачки
-
-   ![fdisk](./Screenshots/fdisk.png)
+- Для адресов были выбраны разные маршруты, т.к. маршрутизатор выбирает маршрут с более длинной маской, т.к. такой путь является более точным.
+#### 5.5. Построение списка маршрутизаторов
+Пример вывода утилиты **traceroute** после добавления шлюза:
+```
+1 10.10.0.1 0 ms 1 ms 0 ms
+2 10.100.0.12 1 ms 0 ms 1 ms
+3 10.20.0.10 12 ms 1 ms 3 ms
+```
+##### Запусти на r1 команду дампа:
+`tcpdump -tnv -i eth0`
  
+ ![r1](./images/Part5/Quest5/r1.png)
 
-## Part 11. Использование утилиты df
+##### При помощи утилиты **traceroute** построй список маршрутизаторов на пути от ws11 до ws21.
 
-- Запуск команды df:
+ ![ws21](./images/Part5/Quest5/ws21.png)
 
-   ![df](./Screenshots/df.png)
+- Traceroute использует ограничение TTL для построения карты сети.
+#### 5.6. Использование протокола **ICMP** при маршрутизации
+##### Запусти на r1 перехват сетевого трафика, проходящего через eth0 с помощью команды:
+`tcpdump -n -i eth0 icmp`
 
-- Размер раздела: 11758760,
+ ![r1before](./images/Part5/Quest6/r1before.png)
 
-   Размер занятого пространства: 4950428 килобайт,
+##### Пропингуй с ws11 несуществующий IP (например, *10.30.0.111*) с помощью команды:
+`ping -c 1 10.30.0.111`
 
-   Размер свободного пространства: 6189224 килобайт, 45%.
+ ![ping](./images/Part5/Quest6/ping.png)
+ 
+ ![r1after](./images/Part5/Quest6/r1after.png)
 
-   df выводит размеры диска в килобайтах (по умолчанию).
+## Part 6. Динамическая настройка IP с помощью **DHCP**
 
-- Запуск команды df -Th:
+##### Для r2 настрой в файле */etc/dhcp/dhcpd.conf* конфигурацию службы **DHCP**:
+##### 1) Укажи адрес маршрутизатора по умолчанию, DNS-сервер и адрес внутренней сети. Пример файла для r2:
+```shell
+subnet 10.100.0.0 netmask 255.255.0.0 {}
 
-   ![dfth](./Screenshots/dfth.png)
+subnet 10.20.0.0 netmask 255.255.255.192
+{
+    range 10.20.0.2 10.20.0.50;
+    option routers 10.20.0.1;
+    option domain-name-servers 10.20.0.1;
+}
+```
 
-- Размер раздела: 12 гигабайт,
+ ![r2 DNS-servver](./images/Part6/Quest1/r2dns.png)
 
-   Размер занятого пространства: 4.8 гигабайт,
+##### 2) В файле *resolv.conf* пропиши `nameserver 8.8.8.8`.
 
-   Размер свободного пространства: 6 гигабайт, 45%.
+ ![r2 DNS-servver](./images/Part6/Quest2/r2resolve.png)
 
-   Тип файловой системы для раздела / - ext4
+##### Перезагрузи службу **DHCP** командой `systemctl restart isc-dhcp-server`. Машину ws21 перезагрузи при помощи `reboot` и через `ip a` покажи, что она получила адрес. Также пропингуй ws22 с ws21.
 
-## Part 12. Использование утилиты du
+ ![dhcp reboot](./images/Part6/Quest2/r2reboot.png)
 
-- Запуск команды du:
+ ![ws21 reboot](./images/Part6/Quest2/ws21reboot.png)
 
-   ![du](./Screenshots/du.png)
+ ![ws21 ip a](./images/Part6/Quest2/ws21ip.png)
 
-- Размер папки /home:
+ ![pinging](./images/Part6/Quest2/pinging.png)
 
-   ![du home](./Screenshots/duHome.png)
+##### Укажи MAC-адрес у ws11, для этого в *etc/netplan/00-installer-config.yaml* надо добавить строки: `macaddress: 10:10:10:10:10:BA`, `dhcp4: true`.
+ 
+ ![mac address](./images/Part6/Quest2/macAddr.png)
 
-- Размер папки /var:
+##### Для r1 настрой аналогично r2, но сделай выдачу адресов с жесткой привязкой к MAC-адресу (ws11). Проведи аналогичные тесты.
+- В отчёте этот пункт опиши аналогично настройке для r1.
+- Указал адрес маршрутизатора по умолчанию, DNS-сервер и адрес внутренней сети:
 
-   ![du var](./Screenshots/duVar.png)
+ ![r1 DNS-servver](./images/Part6/Quest1/r1dns.png)
 
-- Размер папки /var/log:
+- В файле *resolv.conf* прописал `nameserver 8.8.8.8`:
 
-   ![du varlog](./Screenshots/duVarlog.png)
+ ![r1 DNS-servver](./images/Part6/Quest2/r1resolve.png)
 
-- Размер всего содержимого в /var/log:
+- Перезагрузил службу **DHCP** командой `systemctl restart isc-dhcp-server`. Машину ws11 перезагрузил при помощи `reboot` и через `ip a` показываю, что она получила адрес. Также пропинговал ws22 с ws21.
 
-   ![du varlog*](./Screenshots/duVarlog*.png)
+ ![dhcp reboot](./images/Part6/Quest2/r1reboot.png)
 
-## Part 13. Установка и использование утилиты ncdu
+ ![ws21 reboot](./images/Part6/Quest2/ws11reboot.png)
 
-- Размер папки /home:
+ ![ws21 ip a](./images/Part6/Quest2/ws11ip.png)
 
-   ![ncdu home](./Screenshots/ncduHome.png)
+ ![pinging](./images/Part6/Quest2/pinging.png)
 
-- Размер папки /var:
+##### Запроси с ws21 обновление IP-адреса.
 
-   ![ncdu var](./Screenshots/ncduVar.png)
+ ![before](./images/Part6/Quest2/ws21before.png)
+ 
+ ![after](./images/Part6/Quest2/ws21after.png)
 
-- Размер папки /var/log:
+- Как можно увидеть, адрес сменился с 10.20.0.10 на 10.20.0.3
+- Пользовался следующими опциями:
+- option routers ip-address - адреса шлюзов для клиентской сети.
+- option domain-name-servers - список DNS серверов доступных клиенту.
 
-   ![ncdu varlog](./Screenshots/ncduVarlog.png)
 
-## Part 14. Работа с системными журналами
+## Part 7. **NAT**
+##### В файле */etc/apache2/ports.conf* на ws22 и r1 измени строку `Listen 80` на `Listen 0.0.0.0:80`, то есть сделай сервер Apache2 общедоступным.
 
-- Последний логин:
+ ![ws22 apache file](./images/Part7/ws22apache.png)
 
-   ![last Login](./Screenshots/lastLogin.png)
+ ![r1 apache file](./images/Part7/r1apache.png)
 
-- Время логина: 13:19:58
+##### Запусти веб-сервер Apache командой `service apache2 start` на ws22 и r1.
 
-   Имя пользователя: newuser
+ ![ws22 apache file](./images/Part7/ws22apacheStart.png)
 
-   Метод входа в систему: ssh
+ ![r1 apache file](./images/Part7/r1apacheStart.png)
 
-- Перезапуск SSHd:
+##### Добавь в фаервол, созданный по аналогии с фаерволом из Части 4, на r2 следующие правила:
+##### 1) Удаление правил в таблице filter — `iptables -F`;
+##### 2) Удаление правил в таблице «NAT» — `iptables -F -t nat`;
+##### 3) Отбрасывать все маршрутизируемые пакеты — `iptables --policy FORWARD DROP`.
+##### Запусти файл также, как в Части 4.
 
-   ![restart SSHd](./Screenshots/restartSSHD.png)
+ ![firewall r2](./images/Part7/fwr2.png)
 
-## Part 15. Использование планировщика заданий CRON
+ ![firewall start](./images/Part7/fwStart.png)
 
-- Добавление задачи в CRON. Вписывается в конец файла, после выполнения команды crontab -e:
+##### Проверь соединение между ws22 и r1 командой `ping`.
+*При запуске файла с этими правилами, ws22 не должна «пинговаться» с r1.*
 
-   ![cron Tasks](./Screenshots/cronTasks.png)
+ ![r1 pinging ws22](./images/Part7/r1pingingws22.png)
 
-- Результат выполнения:
+##### Добавь в файл ещё одно правило:
+##### 4) Разрешить маршрутизацию всех пакетов протокола **ICMP**.
+##### Запусти файл также, как в Части 4.
 
-   ![cron Result](./Screenshots/cronResult.png)
+ ![new firewall for r2](./images/Part7/fwr2new.png) 
 
-- Очищаем список задач командой crontab -r и выводим все текущие задачи:
+##### Проверь соединение между ws22 и r1 командой `ping`.
+*При запуске файла с этими правилами, ws22 должна «пинговаться» с r1.*
 
-   ![Removing And Showing cron tasks](./Screenshots/removingAndShowing.png)
+ ![r1 pinging ws22 after adding new firewall](./images/Part7/newpingfromr1tows22.png)
+
+##### Добавь в файл ещё два правила:
+##### 5) Включи **SNAT**, а именно маскирование всех локальных IPиз локальной сети, находящейся за r2 (по обозначениям из Части 5 — сеть 10.20.0.0).
+##### 6) Включи **DNAT** на 8080 порт машины r2 и добавить к веб-серверу Apache, запущенному на ws22, доступ извне сети.
+
+ ![Включение S/DNAT](./images/Part7/firewallNAT.png)
+
+##### Запусти файл также, как в Части 4.
+##### Проверь соединение по TCP для **SNAT**: для этого с ws22 подключиться к серверу Apache на r1 командой:
+`telnet [адрес] [порт]`
+
+![Checking SNAT](./images/Part7/telnet1.png)
+
+##### Проверь соединение по TCP для **DNAT**: для этого с r1 подключиться к серверу Apache на ws22 командой `telnet` (обращаться по адресу r2 и порту 8080).
+
+![Checking DNAT](./images/Part7/telnet2.png)
+
+
+## Part 8. Дополнительно. Знакомство с **SSH Tunnels**
+
+##### Запусти на r2 фаервол с правилами из Части 7.
+##### Запусти веб-сервер **Apache** на ws22 только на localhost (то есть в файле */etc/apache2/ports.conf* измени строку `Listen 80` на `Listen localhost:80`).
+
+ ![Apache на ws22 только на localhost](./images/Part8/ApacheLocalhost.png)
+
+##### Воспользуйся *Local TCP forwarding* с ws21 до ws22, чтобы получить доступ к веб-серверу на ws22 с ws21.
+- Попробовал подключиться по ssh на ws22 с ws21:
+
+ ![ssh Failed](./images/Part8/LocalTCP/sshTry.png)
+
+- Меняем ssh порт на ws22 с 2022 на 22:
+
+ ![changing ports](./images/Part8/LocalTCP/changingPortsForSSH.png) 
+
+- И все получается
+
+ ![ssh success](./images/Part8/LocalTCP/sshSuccess.png) 
+
+- Проверяем с помощью telnet:
+
+ ![telnetLocal](./images/Part8/LocalTCP/telnetLocal.png)
+
+##### Воспользуйся *Remote TCP forwarding* c ws11 до ws22, чтобы получить доступ к веб-серверу на ws22 с ws11.
+- Для начала необходимо изменить наш фаервол на r2:
+
+ ![r2fw](./images/Part8/RemoteTCP/r2fw.png)
+
+- Пробуем подключиться:
+
+ ![sshRemote](./images/Part8/RemoteTCP/sshRemote.png)
+
+- Проверяем с помощью telnet:
+
+ ![telnetRemote](./images/Part8/RemoteTCP/telnetRemote.png)
