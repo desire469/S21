@@ -4,13 +4,9 @@ To help you navigate through the material, we have prepared a list of topics tha
 
 We will learn:
 
-- Routing;
-- TCP/IP;
-- Ports;
-- Firewall (iptables);
-- DHCP;
-- NAT;
-- Using utils in terminal (ipcalc/iperf3);
-- ssh tunnels.
+- bash scripts;
+- reading information about the system;
+- decorated console output;
+- working with the Linux file system.
 
-Now that you know what to expect in this project, you can slowly start to study the topics listed above. 😇
+Now that you know what awaits you in this project, you can slowly begin to study the topics listed above. 😇
