@@ -1,362 +1,563 @@
-## Part 1. Установка ОС
 
-- Версия убунты:
-
-   ![UbuntuVersion](./Screenshots/UbuntuVersion.png)
-
-## Part 2. Создание пользователя
-
-- Команда для создания нового пользователя:
-
-   ![passwd](./Screenshots/newUser.png)
-
-
-- Вывод команды  ```cat /ect/passwd```
-
-   ![passwd](./Screenshots/passwd.png)
-- Группы нового пользователя:
-
-   ![groups](./Screenshots/groups.png)
-
-## Part 3. Настройка сети ОС
-
-- Для переименования имени машины я использовал следующую команду: 
-
-   ```sudo hostnamectl set-hostname user-1```
-
-   ![machineRename](./Screenshots/machineRename.png)
-
-
-- Для времени:
-
-   ```sudo timedatectl set-timezone Europe/Moscow```
-
-   Позволяет установить часовой пояс для машины в формате задачи Регион/Город
-
-   ![newTimezone](./Screenshots/newTimezone.png)
-
-
-- Сетевые интерфейсы машины:
-
-   ![networkInterfaces](./Screenshots/networkInterfaces.png)
-
-- Io интерфейс необходим для налаживания работы устройства с вводом и выводом данных в и из сети Например, получение данных с сервера или отправление данных на сервер,
-
-- IP от DHCP:
-
-   ![internal IP from DHCP](./Screenshots/internalIP.png)
-
-- Dynamic Host Configuration Protocol - протокол для автоматического назначения IP-адресса и других параметров устройствам в сети.
-
-- Внутренний и внешний IP адресса соответственно:
-
-   ![Internal IP](./Screenshots/internalIP.png)
-
-   ![External IP](./Screenshots/externalIP.png)
-
-- Для задания статичного айпи-адресса машине я изменял netplan самой машины: 
-
-   ![EditingIPs](./Screenshots/editingIPs.png)
-
-- После изменения и перезапуска машины:
-
-   ![Internal IP after edit](./Screenshots/internalIPafterEdit.png)
-
-- Результаты пингования:
-
-   1.1.1.1
-
-   ![Pinging 1.1.1.1](./Screenshots/pinging1.1.1.1.png)
-
-   ya.ru
-
-   ![Pinging ya.ru](./Screenshots/pingingYa.ru.png)
-
-## Part 4. Обновление ОС
-
-- Обновление системы:
-
-   ![Update system](./Screenshots/update.png)
-
-## Part 5. Использование команды sudo
-
-- Команда sudo позволяет временно получить права администратора для выполнения одной команды.
-
-- Добавление sudo прав пользователю:
-
-   ![Adding Sudo To User](./Screenshots/addingSudoToUser.png)
-
-- Переход на нового пользователя:
-
-   ![Changing To A New User](./Screenshots/changingToANewUser.png)
-
-- Изменине имени машины через нового пользователя:
-
-   ![Changing Hostname Via New User](./Screenshots/changingHostnameViaNewUser.png)
-
-## Part 6. Установка и настройка службы времени
-
-- Вывод времени в котором я сейчас нахожусь:
-
-   ![Outputing Timezone](./Screenshots/outputingTimezone.png)
-
-## Part 7. Установка и использование текстовых редакторов
-
-- VI. Для закрытия ввел команду :wq
-
-   ![vi](./Screenshots/vi.png)
-
-- NANO. Для закрытия ввел последовательно: 
-
-   ```Cmnd+X```
-
-   ```Y```
-
-   ```Enter```
-
-   ![NANO](./Screenshots/nano.png)
-
-- MCEdit. Для закрытия нажал fn+F10:
-
-   ![MCedit](./Screenshots/mcedit.png)
-
-- После изменения и выхода без сохранения:
-
-- VI. Для закрытия без сохранения ввел команду :q!
-
-   ![Vi w/o save](./Screenshots/ViWoSave.png)
-
-- NANO. Для закрытия ввел последовательно: 
-
-   ```Cmnd+X```
-
-   ```N```
-
-   ```Enter```
-   
-   ![NANO w/o save](./Screenshots/NanoWoSave.png)
-
-- MCEdit. Для закрытия нажал fn+F10 и отказался от сохранения:
-
-   ![MC w/o save](./Screenshots/MCWoSave.png)
-
-- VI. 
-
-   Для поиска была введена комада / и после написан искомый текст:
-
-   ![Vi Find](./Screenshots/viFind.png)
-
-   Для поиска и замены было использована команда \:s/заменяемый текст/заменяющий текст/
-
-   ![Vi Find Replace](./Screenshots/viFindReplace.png)
-
-- NANO.
-
-   Для поиска была введена комада Crtl+W и после написан искомый текст:
-
-   ![Nano Find](./Screenshots/nanoFind.png)
-
-   Для поиска и замены было использована команда Ctrl+/ и введено заменяемое слово:
-
-   ![Nano Find Replace](./Screenshots/nanoFindReplace1.png)
-   
-   Ввод заменяющего слова:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace2.png)
-   
-   Результат:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace3.png)
-
-- MCEdit.
-
-   Для поиска была введена команда fm+F7 и после написан искомый текст:
-   ![NC Find](./Screenshots/MCFind.png)
-
-   Для поиска и замены было использована команда fn+F4 и введено заменяемое слово:
-
-   ![MC Find Replace](./Screenshots/MCFindReplace.png)
-
-   Выбор заменяемого найденного слова:
-
-   ![MC Find Replace](./Screenshots/MCFindReplace2.png)
-
-   Результат:
-
-   ![MC Find Replace](./Screenshots/MCFindReplace3.png)
-
-## Part 8. Установка и базовая настройка сервиса SSHD
-- Установка SSHD происходила по вводу команды:
-
-   ```sudo apt install openssh-server```
-
-- Проверка запущенной сервиса SSHd:
-
-   ![SSH status](./Screenshots/sshStatus.png)
-
-- Открытие порта 2022 для SSHd:
-
-   ![SSH allowing 2022](./Screenshots/sshAllowing2022.png)
-
-- Проверяем наличие процесса ssh через ps:
-
-   ![ps SSH](./Screenshots/psSsh.png)
-
-- a: Отображает процессы всех пользователей
-
-   u: Использует формат вывода, который включает дополнительные сведения
-
-   x: Показывает все процессы
-
-- Изменение айпи на статический:
-
-   ![SSH file](./Screenshots/sshFile.png)
-
-- Информация с netstat:
-
-   ![netstat ssh](./Screenshots/netstatSsh.png)
-
-   Флаг а используется для отображения всех сокетов машины, t - для отображения tcp сокетов, n - отображает IP и номера портов вместо цисловых айдишников.
-
-   Столбцы: Proto - протокол, Recv-Q - количество полученных байтов, Send-Q - отправленных, Local Address - локальные айпи с портом процесса,  Foreging Address - внешние айпи с портом процесса, State - статус процесса.
-
-## Part 9. Установка и использование утилит top, htop
-
-- Вывод htop:
-
-   ![htop](./Screenshots/htop.png)
-   
-   Столбцы: PID - уникальный айди процесса, USER - пользователь процесса, PRI - приоритет процесса для процессора, NI - уровень "nice" процесса, VIRT - занимаемый обьем виртуальной памяти процесса, RES - занимаемый обьем ОЗУ у процессора, SHR - обьем памяти который может быть разделен с другими процессами, S - статус процесса, CPU% - нагрузка на процессор процессом, MEM% - нагрузка на память процессом, TIME+ - время работы процесса, Command - путь к исходному файлу процесса.
-
-- Сортировка по PID:
-
-   ![sort By PID](./Screenshots/SortByPID.png)
-
-- Сортировка по MEM:
-
-   ![sort By MEM](./Screenshots/SortByMEM.png)
-
-- Сортировка по CPU:
-
-   ![sort By CPU](./Screenshots/sortByCPU.png)
-
-- Сортировка по TIME:
-
-   ![sort By TIME](./Screenshots/SortByTIME.png)
-
-- Фильтр по sshd:
-
-   ![filter By SSHD](./Screenshots/filetForSSHD.png)
-
-- syslog:
-
-   ![find syslog](./Screenshots/searchForSYSLOG.png)
-
-- hostname, clock, uptime:
-
-   ![htop With HOSTNAME clock UPTIME](./Screenshots/htopWithHOSTNAMEclockUPTIME.png)
-
-## Part 10. Использование утилиты fdisk
-
-- Название диска: /dev/sda
-
-   Размер: 25 гигабайт
-
-   Количество секторов: 52428800
-
-   SWAP: нету в виду отсутствия файла подкачки
-
-   ![fdisk](./Screenshots/fdisk.png)
- 
-
-## Part 11. Использование утилиты df
-
-- Запуск команды df:
-
-   ![df](./Screenshots/df.png)
-
-- Размер раздела: 11758760,
-
-   Размер занятого пространства: 4950428 килобайт,
-
-   Размер свободного пространства: 6189224 килобайт, 45%.
-
-   df выводит размеры диска в килобайтах (по умолчанию).
-
-- Запуск команды df -Th:
-
-   ![dfth](./Screenshots/dfth.png)
-
-- Размер раздела: 12 гигабайт,
-
-   Размер занятого пространства: 4.8 гигабайт,
-
-   Размер свободного пространства: 6 гигабайт, 45%.
-
-   Тип файловой системы для раздела / - ext4
-
-## Part 12. Использование утилиты du
-
-- Запуск команды du:
-
-   ![du](./Screenshots/du.png)
-
-- Размер папки /home:
-
-   ![du home](./Screenshots/duHome.png)
-
-- Размер папки /var:
-
-   ![du var](./Screenshots/duVar.png)
-
-- Размер папки /var/log:
-
-   ![du varlog](./Screenshots/duVarlog.png)
-
-- Размер всего содержимого в /var/log:
-
-   ![du varlog*](./Screenshots/duVarlog*.png)
-
-## Part 13. Установка и использование утилиты ncdu
-
-- Размер папки /home:
-
-   ![ncdu home](./Screenshots/ncduHome.png)
-
-- Размер папки /var:
-
-   ![ncdu var](./Screenshots/ncduVar.png)
-
-- Размер папки /var/log:
-
-   ![ncdu varlog](./Screenshots/ncduVarlog.png)
-
-## Part 14. Работа с системными журналами
-
-- Последний логин:
-
-   ![last Login](./Screenshots/lastLogin.png)
-
-- Время логина: 13:19:58
-
-   Имя пользователя: newuser
-
-   Метод входа в систему: ssh
-
-- Перезапуск SSHd:
-
-   ![restart SSHd](./Screenshots/restartSSHD.png)
-
-## Part 15. Использование планировщика заданий CRON
-
-- Добавление задачи в CRON. Вписывается в конец файла, после выполнения команды crontab -e:
-
-   ![cron Tasks](./Screenshots/cronTasks.png)
-
-- Результат выполнения:
-
-   ![cron Result](./Screenshots/cronResult.png)
-
-- Очищаем список задач командой crontab -r и выводим все текущие задачи:
-
-   ![Removing And Showing cron tasks](./Screenshots/removingAndShowing.png)
+## Part 1. Запуск нескольких Docker-контейнеров с использованием Docker Compose
+
+### Задание
+
+1) Напиши Dockerfile для каждого отдельного микросервиса. Необходимые зависимости описаны в материалах. В отчете отобрази размер собранных образов любого сервиса различными способами.
+
+- ![Размер gateway сервиса](./images/Part1/imageSize.png)
+
+2) Напиши Docker Compose файл, который осуществляет корректное взаимодействие сервисов. Пробрось порты для доступа к gateway service и session service из локальной машины. Помощь по Docker Compose ты найдешь в материалах.
+
+```
+services:
+  booking:
+    build: services/booking-service/
+    environment:
+      HOTEL_SERVICE_HOST: 100.10.12.5
+      HOTEL_SERVICE_PORT: 8082
+      PAYMENT_SERVICE_HOST: 100.10.12.8
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: 100.10.12.6
+      LOYALTY_SERVICE_PORT: 8085
+      POSTGRES_DB: reservations_db
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: "password" 
+      RABBIT_MQ_HOST: 100.10.12.17
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    depends_on:
+      hotel:
+        condition: service_started
+      payment:
+        condition: service_started
+      loyalty:
+        condition: service_started
+      database:
+        condition: service_healthy
+      rabbit:
+        condition: service_started
+    expose:
+      - "8083"
+    networks:
+      main:
+        ipv4_address: 100.10.12.4
+
+  gateway:
+    build: services/gateway-service/
+    ports: 
+      - "8087:8087"
+    expose:
+      - "8087"
+    environment:
+      SESSION_SERVICE_HOST: 100.10.12.10
+      SESSION_SERVICE_PORT: 8081
+      HOTEL_SERVICE_HOST: 100.10.12.5
+      HOTEL_SERVICE_PORT: 8082
+      BOOKING_SERVICE_HOST: 100.10.12.4
+      BOOKING_SERVICE_PORT: 8083
+      LOYALTY_SERVICE_HOST: 100.10.12.6
+      LOYALTY_SERVICE_PORT: 8085
+      PAYMENT_SERVICE_HOST: 100.10.12.8
+      PAYMENT_SERVICE_PORT: 8084
+      REPORT_SERVICE_HOST: 100.10.12.9
+      REPORT_SERVICE_PORT: 8086
+    depends_on:
+      session:
+        condition: service_started
+      hotel:
+        condition: service_started
+      booking:
+        condition: service_started
+      loyalty:
+        condition: service_started
+      payment:
+        condition: service_started
+      report:
+        condition: service_started
+    networks:
+      main:
+        ipv4_address: 100.10.12.3
+
+  hotel:
+    build: services/hotel-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8082"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hotels_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.5
+
+  loyalty:
+    build: services/loyalty-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8085"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: balances_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.6
+
+  database:
+    image: postgres:17-alpine
+    restart: always
+    volumes:
+      - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: aliciaaz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust 
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aliciaaz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      main:
+        ipv4_address: 100.10.12.7
+
+  payment:
+    build: services/payment-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8084"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.8
+
+  report:
+    build: services/report-service/
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbit:
+        condition: service_started
+    expose:
+      - "8086"
+    networks:
+      main:
+        ipv4_address: 100.10.12.9
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: 100.10.12.17
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+
+  session:
+    build: services/session-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8081"
+    ports: 
+      - "8081:8081"
+    networks:
+      main:
+        ipv4_address: 100.10.12.10
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+
+  rabbit:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    expose:
+      - "5672"
+    networks:
+      main:
+        ipv4_address: 100.10.12.17
+
+networks:
+  main:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 100.10.12.0/24
+```
+
+- Файл docker-compose-static.yml имеется в репозитории (./src/docker-compose-static.yml)
+
+
+3) Собери и разверни веб-сервис с помощью написанного Docker Compose файла на локальной машине.
+
+4) Прогони заготовленные тесты через postman и удостоверься, что все они проходят успешно. Инструкцию по запуску тестов можно найти в материалах. В отчете отобрази результаты тестирования.
+
+- ![Тестируем login](./images/Part1/login.png)
+
+- ![Тестируем hotels](./images/Part1/getHotels.png)
+
+- ![Тестируем hotel](./images/Part1/getHotel.png)
+
+- ![Тестируем booking](./images/Part1/book.png)
+
+- ![Тестируем balance](./images/Part1/balance.png)
+
+## Part 2. Создание виртуальных машин
+
+### Задание 
+
+1) Установи и инициализируй Vagrant в корне проекта. Напиши Vagrantfile для одной виртуальной машины. Перенеси исходный код веб-сервиса в рабочую директорию виртуальной машины. Помощь по vagrant ты найдешь в материалах.
+
+```
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.provider "virtualbox" do |vb|
+        vb.name = "manager01"
+        vb.cpus = 1
+        vb.memory = 2048
+  end
+    config.vm.synced_folder "./src", "/home/vagrant/src"
+end 
+```
+
+- Файл Vagrantfile1 имеется в репозитории (./Vagrantfile1)
+
+2) Зайди через консоль внутрь виртуальной машины и удостоверься, что исходный код встал, куда нужно. Останови и уничтожь виртуальную машину.
+
+- ![ls](./images/Part2/ls.png)
+
+- ![ls](./images/Part2/lsSrc.png)
+
+## Part 3. Создание простейшего Docker Swarm
+
+### Задание
+
+1) Модифицируй Vagrantfile для создания трех машин: manager01, worker01, worker02. Напиши shell-скрипты для установки Docker внутрь машин, инициализации и подключения к Docker Swarm. Помощь с Docker Swarm ты найдешь в материалах.
+
+```
+Vagrant.configure("2") do |config|
+    config.vm.box = "ubuntu/jammy64"
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus = 2
+    end
+  
+    config.vm.define "manager01" do |manager|
+      manager.vm.hostname = "manager01"
+
+      manager.vm.network "private_network", ip: "192.168.56.11"
+      manager.vm.network "forwarded_port", guest: 9443, host: 9443, host_ip: "127.0.0.1", id: "portainer_api_9443"
+      manager.vm.network "forwarded_port", guest: 8087, host: 8087, host_ip: "127.0.0.1", id: "nginx_api_8087"
+      manager.vm.network "forwarded_port", guest: 8081, host: 8081, host_ip: "127.0.0.1", id: "nginx_api_8081"
+
+      manager.vm.synced_folder "./src", "/home/vagrant/src"
+  
+      manager.vm.provision "shell", path: "./src/scripts/install_docker.sh", name: "install_docker_manager"
+      manager.vm.provision "shell", path: "./src/scripts/init_swarm_manager.sh", args: ["192.168.56.11"], name: "init_swarm_manager"
+      manager.vm.provision "shell", inline: "docker stack deploy -c src/docker-compose.yml my-stack", name: "deploy_stack"
+    end
+  
+    config.vm.define "worker01" do |worker|
+      worker.vm.hostname = "worker01"
+      worker.vm.network "private_network", ip: "192.168.56.12"
+  
+      worker.vm.synced_folder "./src/scripts", "/home/vagrant/scripts"
+      worker.vm.provision "shell", path: "./src/scripts/install_docker.sh", name: "install_docker_worker1"
+      worker.vm.provision "shell", path: "./src/scripts/join_swarm_worker.sh", name: "join_swarm_worker1"
+    end
+  
+    config.vm.define "worker02" do |worker|
+      worker.vm.hostname = "worker02"
+      worker.vm.network "private_network", ip: "192.168.56.13"
+  
+      worker.vm.synced_folder "./src/scripts", "/home/vagrant/scripts"
+      worker.vm.provision "shell", path: "./src/scripts/install_docker.sh", name: "install_docker_worker2"
+      worker.vm.provision "shell", path: "./src/scripts/join_swarm_worker.sh", name: "join_swarm_worker2"
+    end
+  end
+```
+
+- Файл Vagrantfile имеется в репозитории (./Vagrantfile)
+
+2) Загрузи собранные образы на Docker Hub и модифицируй Docker Compose файл для подгрузки расположенных на Docker Hub образов.
+
+```
+version: '3.8'
+
+services:
+  database:
+    image: postgres:17-alpine
+    hostname: mystackdatabase
+    volumes:
+      - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: aliciaaz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aliciaaz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - main
+
+  rabbit:
+    image: rabbitmq:3-management-alpine
+    hostname: mystackrabbit
+    
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - main
+
+  hotel:
+    image: xedll/hotel-service
+    hostname: mystackhotel
+
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: mystackdatabase:5432
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hotels_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+
+  loyalty:
+    image: xedll/loyalty-service
+    hostname: mystackloyalty
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: mystackdatabase:5432
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: balances_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+
+  payment:
+    image: xedll/payment-service
+    hostname: mystackpayment
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: mystackdatabase:5432
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+
+  session:
+    image: xedll/session-service
+    hostname: mystacksession
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: mystackdatabase:5432
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+
+  report:
+    image: xedll/report-service
+    hostname: mystackreport
+    depends_on:
+      - database
+      - rabbit
+    environment:
+      WAIT_FOR_HOSTS: mystackdatabase:5432 mystackrabbit:5672
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: mystackrabbit
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    networks:
+      - main
+
+  booking:
+    image: xedll/booking-service
+    hostname: mystackbooking
+    depends_on:
+      - hotel
+      - payment
+      - loyalty
+      - database
+      - rabbit
+    environment:
+      WAIT_FOR_HOSTS: mystackhotel:8082 mystackpayment:8084 mystackloyalty:8085 mystackdatabase:5432 mystackrabbit:5672
+      HOTEL_SERVICE_HOST: mystackhotel
+      HOTEL_SERVICE_PORT: 8082
+      PAYMENT_SERVICE_HOST: mystackpayment
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: mystackloyalty
+      LOYALTY_SERVICE_PORT: 8085
+      POSTGRES_DB: reservations_db
+      POSTGRES_HOST: mystackdatabase
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "password"
+      RABBIT_MQ_HOST: mystackrabbit
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    networks:
+      - main
+
+  gateway:
+    image: xedll/gateway-service
+    hostname: mystackgateway
+    depends_on:
+      - session
+      - hotel
+      - booking
+      - loyalty
+      - payment
+      - report
+    environment:
+      WAIT_FOR_HOSTS: mystacksession:8081 mystackhotel:8082 mystackbooking:8083 mystackloyalty:8085 mystackpayment:8084 mystackreport:8086
+      SESSION_SERVICE_HOST: mystacknginx
+      SESSION_SERVICE_PORT: 8081
+      HOTEL_SERVICE_HOST: mystackhotel
+      HOTEL_SERVICE_PORT: 8082
+      BOOKING_SERVICE_HOST: mystackbooking
+      BOOKING_SERVICE_PORT: 8083
+      LOYALTY_SERVICE_HOST: mystackloyalty
+      LOYALTY_SERVICE_PORT: 8085
+      PAYMENT_SERVICE_HOST: mystackpayment
+      PAYMENT_SERVICE_PORT: 8084
+      REPORT_SERVICE_HOST: mystackreport
+      REPORT_SERVICE_PORT: 8086
+    networks:
+      - main
+
+  nginx:
+    image: nginx:latest
+    hostname: mystacknginx
+    
+    volumes:
+      - ./services/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8087:8087"
+      - "8081:8081"
+    networks:
+      - main
+
+networks:
+  main:
+    driver: overlay
+```
+- Файл docker-compose.yml имеется в репозитории (src/docker-compose.yml)
+
+- ![Docker Hub](./images/Part3/hub.png)
+
+3) Подними виртуальные машины и перенеси на менеджер Docker Compose файл. Запусти стек сервисов, используя написанный Docker Compose файл.
+
+- ![Поднятые сервисы](./images/Part3/services.png)
+
+4) Настрой прокси на базе nginx для доступа к gateway service и session service по оверлейной сети. Сами gateway service и session service сделай недоступными напрямую.
+
+```
+upstream gateway-service {
+    server mystackgateway:8087;
+}
+
+
+server {
+    listen 8087;
+
+    location / {
+        proxy_pass http://gateway-service;
+        proxy_set_header Host "localhost:8087";
+    }
+}
+upstream session-service {
+    server mystacksession:8081;
+}
+
+server {
+    listen 8081;
+
+    location / {
+        proxy_pass http://session-service;
+        proxy_set_header Host "localhost:8081";
+    }
+}
+```
+- Файл nginx.conf имеется в репозитории (src/services/nginx/default.conf)
+
+5) Прогони заготовленные тесты через Postman и удостоверься, что все они проходят успешно. В отчете отобрази результаты тестирования.
+
+- ![Тестируем login](./images/Part3/login.png)
+
+- ![Тестируем hotels](./images/Part3/getHotels.png)
+
+- ![Тестируем hotel](./images/Part3/getHotel.png)
+
+- ![Тестируем booking](./images/Part3/book.png)
+
+- ![Тестируем balance](./images/Part3/balance.png)
+
+
+6) Используя команды Docker, отобрази в отчете распределение контейнеров по узлам.
+
+- ![Смотрим контейнеры](./images/Part3/containers.png)
+
+7) Установи отдельным стеком Portainer внутри кластера. В отчете отобрази визуализацию распределения задач по узлам с помощью Portainer.
+
+- ![Portainer](./images/Part3/portainer.png)

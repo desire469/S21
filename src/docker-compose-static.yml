@@ -1,0 +1,203 @@
+services:
+  booking:
+    build: services/booking-service/
+    environment:
+      HOTEL_SERVICE_HOST: 100.10.12.5
+      HOTEL_SERVICE_PORT: 8082
+      PAYMENT_SERVICE_HOST: 100.10.12.8
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: 100.10.12.6
+      LOYALTY_SERVICE_PORT: 8085
+      POSTGRES_DB: reservations_db
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres 
+      POSTGRES_PASSWORD: "password" 
+      RABBIT_MQ_HOST: 100.10.12.17
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    depends_on:
+      hotel:
+        condition: service_started
+      payment:
+        condition: service_started
+      loyalty:
+        condition: service_started
+      database:
+        condition: service_healthy
+      rabbit:
+        condition: service_started
+    expose:
+      - "8083"
+    networks:
+      main:
+        ipv4_address: 100.10.12.4
+
+  gateway:
+    build: services/gateway-service/
+    ports: 
+      - "8087:8087"
+    expose:
+      - "8087"
+    environment:
+      SESSION_SERVICE_HOST: 100.10.12.10
+      SESSION_SERVICE_PORT: 8081
+      HOTEL_SERVICE_HOST: 100.10.12.5
+      HOTEL_SERVICE_PORT: 8082
+      BOOKING_SERVICE_HOST: 100.10.12.4
+      BOOKING_SERVICE_PORT: 8083
+      LOYALTY_SERVICE_HOST: 100.10.12.6
+      LOYALTY_SERVICE_PORT: 8085
+      PAYMENT_SERVICE_HOST: 100.10.12.8
+      PAYMENT_SERVICE_PORT: 8084
+      REPORT_SERVICE_HOST: 100.10.12.9
+      REPORT_SERVICE_PORT: 8086
+    depends_on:
+      session:
+        condition: service_started
+      hotel:
+        condition: service_started
+      booking:
+        condition: service_started
+      loyalty:
+        condition: service_started
+      payment:
+        condition: service_started
+      report:
+        condition: service_started
+    networks:
+      main:
+        ipv4_address: 100.10.12.3
+
+  hotel:
+    build: services/hotel-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8082"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hotels_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.5
+
+  loyalty:
+    build: services/loyalty-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8085"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: balances_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.6
+
+  database:
+    image: postgres:17-alpine
+    restart: always
+    volumes:
+      - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: aliciaaz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust 
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aliciaaz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      main:
+        ipv4_address: 100.10.12.7
+
+  payment:
+    build: services/payment-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8084"
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: postgres
+    networks:
+      main:
+        ipv4_address: 100.10.12.8
+
+  report:
+    build: services/report-service/
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbit:
+        condition: service_started
+    expose:
+      - "8086"
+    networks:
+      main:
+        ipv4_address: 100.10.12.9
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: 100.10.12.17
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+
+  session:
+    build: services/session-service/
+    depends_on:
+      database:
+        condition: service_healthy
+    expose:
+      - "8081"
+    ports: 
+      - "8081:8081"
+    networks:
+      main:
+        ipv4_address: 100.10.12.10
+    environment:
+      POSTGRES_HOST: 100.10.12.7
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+
+  rabbit:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    expose:
+      - "5672"
+    networks:
+      main:
+        ipv4_address: 100.10.12.17
+
+networks:
+  main:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 100.10.12.0/24
