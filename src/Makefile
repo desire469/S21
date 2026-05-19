@@ -1,35 +1,56 @@
-SRC_K8S=k8s
-SRC_DOCKER=services
-SRC_SCRIPTS=static/Part2/scripts
+HOME=/home/vagrant
+SRC_K8S=$(HOME)/src/k8s
 SRC_MANIFESTS=$(SRC_K8S)/manifests
 SRC_TEMPLATES=$(SRC_K8S)/templates
-PATH_TO_INIT_SQL=services/database
+PATH_TO_INIT_SQL=$(HOME)/src/services/database
 NAMESPACE=service
 
 .DEFAULT_GOAL := help
 
 help:
 	@echo "Доступные команды:"
-	@echo "  make start               - Полный цикл: очистка, генерация манифестов, применение, проброс портов"
-	@echo "  make clear_all           - Полная очистка: удалить ресурсы K8s, убить port-forward и dashboard"
-	@echo "  make clear_service       - Удалить все ресурсы (deployment, service, configmap, secret, pvc) в namespace $(NAMESPACE)"
-	@echo "  make generate_manifests  - Сгенерировать .yaml из .template.yaml через envsubst (из папки templates -> manifests)"
-	@echo "  make apply_service       - Применить все манифесты и создать configmap с init.sql"
-	@echo "  make get_service         - Показать pods, configmaps, secrets, services в namespace $(NAMESPACE)"
-	@echo "  make describe_service    - Подробное описание ресурсов"
-	@echo "  make secrets             - Декодировать и показать значения секрета app-secrets"
-	@echo "  make logs                - Вывести логи всех подов в namespace service"
-	@echo "  make forward_ports       - Запустить port-forward для gateway (8087) и session (8081) (предварительно убивает старые процессы)"
-	@echo "  make kill_forwarded_ports- Принудительно завершить все port-forward для gateway/session"
-	@echo "  make up_dashboard        - Запустить minikube dashboard в фоне"
-	@echo "  make kill_dashboard      - Остановить процесс minikube dashboard"
-	@echo "  make build_new_dockers   - Собрать Docker-образы всех сервисов с тегом :2.0"
-	@echo "  make check_time          - Замерить время переключения стратегий Recreate и RollingUpdate для gateway"
+	@echo "  make install_nginx        - Установить Ingress-Nginx Controller в кластер"
+	@echo "  make install_cert         - Установить cert-manager"
+	@echo "  make apply_cert           - Применить манифест cert_manager.yaml"
+	@echo "  make apply_ingress        - Применить ingress.yaml и добавить запись в /etc/hosts"
+	@echo "  make apply_pv             - Применить postgres-pvc.yaml (PersistentVolume)"
+	@echo "  make setup_nginx          - Установить nginx на manager01 и скопировать конфиг"
+	@echo "  make setup_prometheus     - Установить Prometheus (bundle.yaml + prometheus.yaml)"
+	@echo "  make start                - Очистить всё, применить сервисы и запустить port-forward"
+	@echo "  make clear_all            - Удалить все ресурсы и убить forwarded порты"
+	@echo "  make clear_service        - Удалить все deployment, service, configmap, secret, pvc в namespace $(NAMESPACE)"
+	@echo "  make apply_service        - Применить все манифесты сервисов и configmap с init.sql"
+	@echo "  make kill_forwarded_ports - Остановить port-forward для gateway и session"
+	@echo "  make forward_ports        - Запустить port-forward для gateway (8087) и session (8081)"
 
-	
-start: clear_all generate_manifests apply_service forward_ports
+install_nginx:
+	vagrant ssh manager01 -- sudo kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.15.1/deploy/static/provider/cloud/deploy.yaml	
 
-clear_all: clear_service kill_forwarded_ports kill_dashboard
+install_cert:
+	vagrant ssh manager01 -- sudo kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
+
+apply_cert:
+	vagrant ssh manager01 -- sudo kubectl apply -f $(SRC_K8S)/cert_manager.yaml
+
+apply_ingress:
+	vagrant ssh manager01 -- sudo kubectl apply -f $(SRC_K8S)/ingress.yaml; \
+	INGRESS_IP=$$(vagrant ssh manager01 -- "kubectl get ingress -n service --no-headers | awk '{print \$$4}'"); \
+	vagrant ssh manager01 -- echo "$$INGRESS_IP app.do11.com" | sudo tee -a /etc/hosts
+
+apply_pv:
+	vagrant ssh manager01 -- sudo kubectl apply -f $(SRC_K8S)/postgres-pvc.yaml
+
+setup_nginx:
+	vagrant ssh manager01 -- sudo apt install nginx; \
+	vagrant ssh manager01 -- cp /home/vagrant/src/services/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+setup_prometheus:
+	vagrant ssh manager01 -- sudo kubectl -f --server-side $(SRC_K8S)/bundle.yaml
+	vagrant ssh manager01 -- sudo kubectl -f --server-side ${SRC_K8S}/prometheus.yaml
+
+start: clear_all apply_service forward_ports
+
+clear_all: clear_service kill_forwarded_ports 
 
 clear_service:
 	kubectl delete deployment,service,configmap,secret,pvc --all --namespace=$(NAMESPACE)
@@ -40,7 +61,7 @@ apply_service:
 	kubectl apply -f $(SRC_MANIFESTS)/secrets.yaml
 		kubectl create configmap postgres-init-script \
 		--from-file=$(PATH_TO_INIT_SQL)/init.sql \
-		--namespace=$(NAMESPACE)
+		--namespace=$(NAMESPACE) || true
 	kubectl apply -f $(SRC_MANIFESTS)/postgres.yaml
 	kubectl apply -f $(SRC_MANIFESTS)/booking.yaml
 	kubectl apply -f $(SRC_MANIFESTS)/gateway.yaml
@@ -51,63 +72,9 @@ apply_service:
 	kubectl apply -f $(SRC_MANIFESTS)/report.yaml
 	kubectl apply -f $(SRC_MANIFESTS)/session.yaml
 
-
-get_service:
-	kubectl get pods,configmaps,secrets,services --namespace=$(NAMESPACE)
-
-describe_service:
-	kubectl describe pods,configmap,secrets,services --namespace=$(NAMESPACE)
-
-secrets:
-	kubectl get secret app-secrets --namespace=service -o jsonpath='{.data.POSTGRES_USER}' | base64 --decode; echo
-
-	kubectl get secret app-secrets --namespace=service -o jsonpath='{.data.POSTGRES_PASSWORD}' | base64 --decode; echo
-
-	kubectl get secret app-secrets --namespace=service -o jsonpath='{.data.RABBIT_MQ_USER}' | base64 --decode; echo
-
-	kubectl get secret app-secrets --namespace=service -o jsonpath='{.data.RABBIT_MQ_PASSWORD}' | base64 --decode; echo
-
-	kubectl get secret app-secrets --namespace=service -o jsonpath='{.data.AUTH_TOKEN}' | base64 --decode; echo
-
-logs:
-	for pod in $$(kubectl get pods -n service -o name); do echo "=== $$pod ==="; kubectl logs -n service $$pod; done; echo
-
-kill_dashboard:
-	-pkill -f "minikube dashboard" || true
-
-up_dashboard:
-	minikube dashboard&
-
 kill_forwarded_ports:
 	-pkill -f "kubectl port-forward.*service/(session|gateway)-service"
 
 forward_ports: kill_forwarded_ports
 	kubectl port-forward -n service service/gateway-service 8087:8087&
 	kubectl port-forward -n service service/session-service 8081:8081&
-
-build_new_dockers:
-	docker build -t xedll/gateway-service:2.0 $(SRC_DOCKER)/gateway-service
-	docker build -t xedll/booking-service:2.0 $(SRC_DOCKER)/booking-service
-	docker build -t xedll/hotel-service:2.0 $(SRC_DOCKER)/hotel-service
-	docker build -t xedll/loyalty-service:2.0 $(SRC_DOCKER)/loyalty-service
-	docker build -t xedll/payment-service:2.0 $(SRC_DOCKER)/payment-service
-	docker build -t xedll/report-service:2.0 $(SRC_DOCKER)/report-service
-	docker build -t xedll/session-service:2.0 $(SRC_DOCKER)/session-service
-
-generate_manifests:
-	for manifest in $$(ls $(SRC_TEMPLATES) | rev | cut -c 15- | rev); do set -a; source ${SRC_K8S}/.env; set +a; envsubst < ${SRC_TEMPLATES}/$$manifest.template.yaml > $(SRC_MANIFESTS)/$$manifest.yaml; done;
-
-check_time:
-	minikube image load xedll/gateway-service:1.0
-	minikube image load xedll/gateway-service:2.0
-	minikube image load xedll/gateway-service:latest
-
-	kubectl patch deployment -n service gateway-service -p '{"spec":{"strategy":{"type":"Recreate","rollingUpdate":null}}}'
-
-	$(SRC_SCRIPTS)/get_time_recreate.sh
-
-	kubectl patch deployment -n service gateway-service -p '{"spec":{"strategy":{"type":"RollingUpdate"}}}'
-
-	$(SRC_SCRIPTS)/get_time_rolling.sh
-
-	kubectl set image deployment/gateway-service -n service gateway-service=xedll/gateway-service:latest

@@ -1,4 +1,4 @@
-# Basic Kubernetes
+# Advanced Kubernetes
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -6,8 +6,7 @@
 
 1. [Chapter I](#chapter-i) 
 2. [Chapter II](#chapter-ii) \
-   2.1. [Ready-made manifest](#part-1-ready-made-manifest) \
-   2.2. [Your own manifest](#part-2-your-own-manifest)
+   2.1. [Deploying your own k3s cluster](#part-1-deploying-your-own-k3s-cluster) \
 
 ## Instructions
 
@@ -33,45 +32,28 @@ Besides Docker Swarm, there are many other orchestration tools. One of the most 
 
 ## Chapter II
 
-The result of this work must be a report containing detailed descriptions of how to implement each point, accompanied by screenshots. Prepare the report as a Markdown file in the `src` directory named `REPORT.MD`.
+The result of the work must be a report with detailed descriptions and screenshots of the implementation of each point. Prepare the report as a Markdown file in the `src` directory named `REPORT.MD`.
 
-## Part 1. Ready-made manifest
-
-### Task
-
-1. Run a Kubernetes environment with 4 GB of memory.
-
-2. Apply the manifest from the `/src/example` directory to the created Kubernetes environment.
-
-3. Run the standard Kubernetes control panel with the command `minikube dashboard`.
-
-4. Create tunnels to access the deployed services with the command `minikube service`.
-
-5. Check that the deployed application is working by opening the application page in a browser (Apache service).
-
-## Part 2. Your own manifest
+## Part 1. Deploying your own k3s cluster
 
 ### Task 
 
-1. Create your own YAML files or manifests for the application from the first project (`/src/services`), implementing the following:
-   - a configuration map with values for database hosts and services;
-   - secrets containing the database password, login information, and cross-service authorization keys (found in the `application.properties` files);
-   - pods and services for all application modules: PostgreSQL, RabbitMQ, and seven application services. Use a single replica for all services.
+1. Obtain a set of virtual machines for the cluster.
 
-2. Run the application by sequentially applying manifests with the command: `kubectl apply -f <manifest>.yaml`.
+2. Install k3s on all three machines. During installation, do not use the standard Ingress Controller by adding the flag `--disable=traefik`.
 
-3. Use the command `kubectl get <object_type> <object_name>` and `kubectl describe <object_type> <object_name>` to check the status of created objects (secrets, configuration maps, pods, and services) in the cluster. Add the results to the report.
+3. Connect the nodes to the cluster using the `k3s server` command and the `-token` and `--server` flags for the worker and master nodes, respectively. Once k3s is installed, the environment variable `NODE_TOKEN` can be used.
 
-4. Check the secret values by applying the command: `kubectl get secret my-secret -o jsonpath='{.data.password}' | base64 --decode` to decode the secret.
+4. Install the Ingress Controller Nginx instead of the default one. You can use the official nginx-based ingress controller manifest file available on GitHub.
 
-5. Check the logs of the application running in the cluster using the command: `kubectl logs <container_name>`. Add a screenshot to the report.
+5. Get a domain name and configure the `cert-manager` utility inside the cluster. This should generate a wildcard certificate for the domain.
 
-6. Create tunnels to access the gateway and session services.
+6. Create an Ingress resource for your personal domain, and configure it to use the Nginx Ingress Controller and the obtained certificate.
 
-7. Run the Postman functional tests to ensure that the application is working properly.
+7. Create a Persistent Volume (PV) for the PostgreSQL database in the manifest from the tenth project.
 
-8. Run the standard Kubernetes control panel with the command `minikube dashboard`. Include screenshots from the dashboard in the report showing the current state of the cluster nodes, a list of running Pods, and other metrics such as CPU and memory utilization, Pod logs, and Pod configurations and secrets.
+8. Run the application described in the manifest.
 
-9. Update the application by adding a new dependency to the POM file and rebuild the application using the following deployment strategies. Measure the application redeployment time for each case and note the results in the report:
-   - Recreate,
-   - Rolling.
+9. Run Postman functional tests to ensure that the application is working properly.
+
+10. Install and run the Prometheus Operator to collect metrics in the system. Include the result of the `kubectl get pods -n monitoring` command in the report.

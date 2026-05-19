@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+  namespace: service
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-cert
+  namespace: service
+spec:
+  secretName: my-wildcard-tls
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: "*.do11.com"
+  dnsNames:
+  - "do11.com"
+  - "*.do11.com"
