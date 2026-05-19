@@ -1,362 +1,182 @@
-## Part 1. Установка ОС
+## Part 1. Готовый докер
 
-- Версия убунты:
+#### Возьми официальный докер-образ с nginx и выкачай его при помощи docker pull.
 
-   ![UbuntuVersion](./Screenshots/UbuntuVersion.png)
+- ![Скачивание официального nginx докер-образа](./images/Part1/1.png)
 
-## Part 2. Создание пользователя
+#### Проверь наличие докер-образа через docker images.
 
-- Команда для создания нового пользователя:
+- ![Проверка наличия докер-образа](./images/Part1/2.png)
 
-   ![passwd](./Screenshots/newUser.png)
+#### Запусти докер-образ через docker run -d [image_id|repository].
 
+- ![Запуск образа](./images/Part1/3.png)
 
-- Вывод команды  ```cat /ect/passwd```
+#### Проверь, что образ запустился через docker ps.
 
-   ![passwd](./Screenshots/passwd.png)
-- Группы нового пользователя:
+- ![Проверка запуска контейнера](./images/Part1/4.png)
 
-   ![groups](./Screenshots/groups.png)
+#### Посмотри информацию о контейнере через docker inspect [container_id|container_name].
 
-## Part 3. Настройка сети ОС
+#### По выводу команды определи и помести в отчёт размер контейнера, список замапленных портов и ip контейнера.
 
-- Для переименования имени машины я использовал следующую команду: 
+- ![Размер](./images/Part1/size.png)
 
-   ```sudo hostnamectl set-hostname user-1```
+- ![Порты](./images/Part1/ports.png)
 
-   ![machineRename](./Screenshots/machineRename.png)
+- ![Айпи](./images/Part1/IP.png)
 
+-  Размер: 160854769 байт, Список портов: 80/tcp, IP контейнера: 172.17.0.2
 
-- Для времени:
+#### Останови докер контейнер через docker stop [container_id|container_name].
 
-   ```sudo timedatectl set-timezone Europe/Moscow```
+- ![Остановка контейнера](./images/Part1/5.png)
 
-   Позволяет установить часовой пояс для машины в формате задачи Регион/Город
+#### Проверь, что контейнер остановился через docker ps.
 
-   ![newTimezone](./Screenshots/newTimezone.png)
+- ![Проверка остановки контейнера](./images/Part1/6.png)
 
+#### Запусти докер с портами 80 и 443 в контейнере, замапленными на такие же порты на локальной машине, через команду run.
 
-- Сетевые интерфейсы машины:
+- ![Запуск контейнера с пробросом портов](./images/Part1/7.png)
 
-   ![networkInterfaces](./Screenshots/networkInterfaces.png)
+#### Проверь, что в браузере по адресу localhost:80 доступна стартовая страница nginx.
 
-- Io интерфейс необходим для налаживания работы устройства с вводом и выводом данных в и из сети Например, получение данных с сервера или отправление данных на сервер,
+- ![Проверка nginx странички](./images/Part1/8.png)
 
-- IP от DHCP:
+#### Перезапусти докер контейнер через docker restart [container_id|container_name].
 
-   ![internal IP from DHCP](./Screenshots/internalIP.png)
+#### Проверь любым способом, что контейнер запустился.
 
-- Dynamic Host Configuration Protocol - протокол для автоматического назначения IP-адресса и других параметров устройствам в сети.
+- ![Рестарт с проверкой контейнера](./images/Part1/9.png)
 
-- Внутренний и внешний IP адресса соответственно:
 
-   ![Internal IP](./Screenshots/internalIP.png)
+## Part 2. Операции с контейнером
 
-   ![External IP](./Screenshots/externalIP.png)
+#### Прочитай конфигурационный файл nginx.conf внутри докер контейнера через команду exec.
 
-- Для задания статичного айпи-адресса машине я изменял netplan самой машины: 
+- ![Чтение nginx.conf внутри контейнера через docker exec](./images/Part2/1.png)
 
-   ![EditingIPs](./Screenshots/editingIPs.png)
+#### Создай на локальной машине файл nginx.conf.
 
-- После изменения и перезапуска машины:
+#### Настрой в нем по пути /status отдачу страницы статуса сервера nginx.
 
-   ![Internal IP after edit](./Screenshots/internalIPafterEdit.png)
+- ![Создание nginx.conf на локальной машине](./images/Part2/2.png)
 
-- Результаты пингования:
+#### Скопируй созданный файл nginx.conf внутрь докер-образа через команду docker cp.
 
-   1.1.1.1
+- ![Копируем созданный конфиг в контейнер](./images/Part2/3.png)
 
-   ![Pinging 1.1.1.1](./Screenshots/pinging1.1.1.1.png)
+#### Перезапусти nginx внутри докер-образа через команду exec.
 
-   ya.ru
+- ![Перезапускаем nginx](./images/Part2/4.png)
 
-   ![Pinging ya.ru](./Screenshots/pingingYa.ru.png)
+#### Проверь, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
-## Part 4. Обновление ОС
+- ![Проверяем наличие странички](./images/Part2/5.png)
 
-- Обновление системы:
+#### Экспортируй контейнер в файл container.tar через команду export.
 
-   ![Update system](./Screenshots/update.png)
+- ![Экспортируем контейнер](./images/Part2/6.png)
 
-## Part 5. Использование команды sudo
+#### Останови контейнер.
 
-- Команда sudo позволяет временно получить права администратора для выполнения одной команды.
+#### Удали образ через docker rmi [image_id|repository], не удаляя перед этим контейнеры.
 
-- Добавление sudo прав пользователю:
+#### Удали остановленный контейнер.
 
-   ![Adding Sudo To User](./Screenshots/addingSudoToUser.png)
+- ![Останавливаем, удаляем образ с контейнером](./images/Part2/7.png)
 
-- Переход на нового пользователя:
+#### Импортируй контейнер обратно через команду import.
 
-   ![Changing To A New User](./Screenshots/changingToANewUser.png)
+#### Запусти импортированный контейнер.
 
-- Изменине имени машины через нового пользователя:
+- ![Импортируем и запускаем контейнер из .tor файла](./images/Part2/8.png)
 
-   ![Changing Hostname Via New User](./Screenshots/changingHostnameViaNewUser.png)
+#### Проверь, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
 
-## Part 6. Установка и настройка службы времени
+- ![Проверяем наличие /status](./images/Part2/9.png)
 
-- Вывод времени в котором я сейчас нахожусь:
 
-   ![Outputing Timezone](./Screenshots/outputingTimezone.png)
+## Part 3. Мини веб-сервер
 
-## Part 7. Установка и использование текстовых редакторов
+##### Напиши мини-сервер на **C** и **FastCgi**, который будет возвращать простейшую страничку с надписью `Hello, World!`.
+##### Запусти написанный мини-сервер через *spawn-fcgi* на порту 8080.
 
-- VI. Для закрытия ввел команду :wq
+- ![Запуск сервера на С](./images/Part3/start_server.png)
 
-   ![vi](./Screenshots/vi.png)
+##### Напиши свой *nginx.conf*, который будет проксировать все запросы с 81 порта на *127.0.0.1:8080*.
+##### Запусти локально **nginx** с написанной конфигурацией.
 
-- NANO. Для закрытия ввел последовательно: 
+- ![Запуск nginx сервера](./images/Part3/start_nginx.png)
 
-   ```Cmnd+X```
+##### Проверь, что в браузере по *localhost:81* отдается написанная тобой страничка.
 
-   ```Y```
+- ![Проверяем](./images/Part3/checking_server.png)
 
-   ```Enter```
+##### Положи файл *nginx.conf* по пути *./nginx/nginx.conf* (это понадобится позже).
 
-   ![NANO](./Screenshots/nano.png)
+## Part 4. Свой докер
 
-- MCEdit. Для закрытия нажал fn+F10:
+*При написании докер-образа избегай множественных вызовов команд RUN*
 
-   ![MCedit](./Screenshots/mcedit.png)
+#### Напиши свой докер-образ, который:
+##### 1) собирает исходники мини сервера на FastCgi из [Части 3](#part-3-мини-веб-сервер);
+##### 2) запускает его на 8080 порту;
+##### 3) копирует внутрь образа написанный *./nginx/nginx.conf*;
+##### 4) запускает **nginx**.
+_**nginx** можно установить внутрь докера самостоятельно, а можно воспользоваться готовым образом с **nginx**'ом, как базовым._
 
-- После изменения и выхода без сохранения:
+##### Собери написанный докер-образ через `docker build` при этом указав имя и тег.
 
-- VI. Для закрытия без сохранения ввел команду :q!
+- ![Запуск docker build](./images/Part4/build.png)
 
-   ![Vi w/o save](./Screenshots/ViWoSave.png)
+##### Проверь через `docker images`, что все собралось корректно.
 
-- NANO. Для закрытия ввел последовательно: 
+- ![Запуск docker build](./images/Part4/images.png)
 
-   ```Cmnd+X```
+##### Запусти собранный докер-образ с маппингом 81 порта на 80 на локальной машине и маппингом папки *./nginx* внутрь контейнера по адресу, где лежат конфигурационные файлы **nginx**'а (см. [Часть 2](#part-2-операции-с-контейнером)).
 
-   ```N```
+- ![Запуск docker run](./images/Part4/runContainer.png)
 
-   ```Enter```
-   
-   ![NANO w/o save](./Screenshots/NanoWoSave.png)
+##### Проверь, что по localhost:80 доступна страничка написанного мини сервера.
 
-- MCEdit. Для закрытия нажал fn+F10 и отказался от сохранения:
+- ![Смотрим страничку](./images/Part4/check.png)
 
-   ![MC w/o save](./Screenshots/MCWoSave.png)
+##### Допиши в *./nginx/nginx.conf* проксирование странички */status*, по которой надо отдавать статус сервера **nginx**.
+##### Пересобери докер-образ.
+*Если всё сделано верно, то, после сохранения файла и перезапуска контейнера, конфигурационный файл внутри докер-образа должен обновиться самостоятельно без лишних действий*.
+##### Проверь, что теперь по *localhost:80/status* отдается страничка со статусом **nginx**
 
-- VI. 
+- ![Проверяем](./images/Part4/status.png)
 
-   Для поиска была введена комада / и после написан искомый текст:
+## Part 5. **Dockle**
 
-   ![Vi Find](./Screenshots/viFind.png)
+##### Просканируй образ из предыдущего задания через `dockle [image_id|repository]`.
 
-   Для поиска и замены было использована команда \:s/заменяемый текст/заменяющий текст/
+- ![Проверяем](./images/Part5/dockle.png)
 
-   ![Vi Find Replace](./Screenshots/viFindReplace.png)
+##### Исправь образ так, чтобы при проверке через **dockle** не было ошибок и предупреждений.
 
-- NANO.
+- ![Исправили](./images/Part5/newImage.png)
 
-   Для поиска была введена комада Crtl+W и после написан искомый текст:
+## Part 6. Базовый **Docker Compose**
 
-   ![Nano Find](./Screenshots/nanoFind.png)
+##### Напиши файл *docker-compose.yml*, с помощью которого:
+##### 1) Подними докер-контейнер из [Части 5](#part-5-инструмент-dockle) _(он должен работать в локальной сети, т. е. не нужно использовать инструкцию **EXPOSE** и мапить порты на локальную машину)_.
+##### 2) Подними докер-контейнер с **nginx**, который будет проксировать все запросы с 8080 порта на 81 порт первого контейнера.
+##### Замапь 8080 порт второго контейнера на 80 порт локальной машины.
 
-   Для поиска и замены было использована команда Ctrl+/ и введено заменяемое слово:
+##### Останови все запущенные контейнеры.
 
-   ![Nano Find Replace](./Screenshots/nanoFindReplace1.png)
-   
-   Ввод заменяющего слова:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace2.png)
-   
-   Результат:
-   
-   ![Nano Find Replace](./Screenshots/nanoFindReplace3.png)
+- ![Останавливаем](./images/Part6/containers.png)
 
-- MCEdit.
+##### Собери и запусти проект с помощью команд `docker-compose build` и `docker-compose up`.
 
-   Для поиска была введена команда fm+F7 и после написан искомый текст:
-   ![NC Find](./Screenshots/MCFind.png)
+- ![Билдим](./images/Part6/build.png)
 
-   Для поиска и замены было использована команда fn+F4 и введено заменяемое слово:
+- ![Поднимаем](./images/Part6/up.png)
 
-   ![MC Find Replace](./Screenshots/MCFindReplace.png)
+##### Проверь, что в браузере по *localhost:80* отдается написанная тобой страничка, как и ранее.
 
-   Выбор заменяемого найденного слова:
-
-   ![MC Find Replace](./Screenshots/MCFindReplace2.png)
-
-   Результат:
-
-   ![MC Find Replace](./Screenshots/MCFindReplace3.png)
-
-## Part 8. Установка и базовая настройка сервиса SSHD
-- Установка SSHD происходила по вводу команды:
-
-   ```sudo apt install openssh-server```
-
-- Проверка запущенной сервиса SSHd:
-
-   ![SSH status](./Screenshots/sshStatus.png)
-
-- Открытие порта 2022 для SSHd:
-
-   ![SSH allowing 2022](./Screenshots/sshAllowing2022.png)
-
-- Проверяем наличие процесса ssh через ps:
-
-   ![ps SSH](./Screenshots/psSsh.png)
-
-- a: Отображает процессы всех пользователей
-
-   u: Использует формат вывода, который включает дополнительные сведения
-
-   x: Показывает все процессы
-
-- Изменение айпи на статический:
-
-   ![SSH file](./Screenshots/sshFile.png)
-
-- Информация с netstat:
-
-   ![netstat ssh](./Screenshots/netstatSsh.png)
-
-   Флаг а используется для отображения всех сокетов машины, t - для отображения tcp сокетов, n - отображает IP и номера портов вместо цисловых айдишников.
-
-   Столбцы: Proto - протокол, Recv-Q - количество полученных байтов, Send-Q - отправленных, Local Address - локальные айпи с портом процесса,  Foreging Address - внешние айпи с портом процесса, State - статус процесса.
-
-## Part 9. Установка и использование утилит top, htop
-
-- Вывод htop:
-
-   ![htop](./Screenshots/htop.png)
-   
-   Столбцы: PID - уникальный айди процесса, USER - пользователь процесса, PRI - приоритет процесса для процессора, NI - уровень "nice" процесса, VIRT - занимаемый обьем виртуальной памяти процесса, RES - занимаемый обьем ОЗУ у процессора, SHR - обьем памяти который может быть разделен с другими процессами, S - статус процесса, CPU% - нагрузка на процессор процессом, MEM% - нагрузка на память процессом, TIME+ - время работы процесса, Command - путь к исходному файлу процесса.
-
-- Сортировка по PID:
-
-   ![sort By PID](./Screenshots/SortByPID.png)
-
-- Сортировка по MEM:
-
-   ![sort By MEM](./Screenshots/SortByMEM.png)
-
-- Сортировка по CPU:
-
-   ![sort By CPU](./Screenshots/sortByCPU.png)
-
-- Сортировка по TIME:
-
-   ![sort By TIME](./Screenshots/SortByTIME.png)
-
-- Фильтр по sshd:
-
-   ![filter By SSHD](./Screenshots/filetForSSHD.png)
-
-- syslog:
-
-   ![find syslog](./Screenshots/searchForSYSLOG.png)
-
-- hostname, clock, uptime:
-
-   ![htop With HOSTNAME clock UPTIME](./Screenshots/htopWithHOSTNAMEclockUPTIME.png)
-
-## Part 10. Использование утилиты fdisk
-
-- Название диска: /dev/sda
-
-   Размер: 25 гигабайт
-
-   Количество секторов: 52428800
-
-   SWAP: нету в виду отсутствия файла подкачки
-
-   ![fdisk](./Screenshots/fdisk.png)
- 
-
-## Part 11. Использование утилиты df
-
-- Запуск команды df:
-
-   ![df](./Screenshots/df.png)
-
-- Размер раздела: 11758760,
-
-   Размер занятого пространства: 4950428 килобайт,
-
-   Размер свободного пространства: 6189224 килобайт, 45%.
-
-   df выводит размеры диска в килобайтах (по умолчанию).
-
-- Запуск команды df -Th:
-
-   ![dfth](./Screenshots/dfth.png)
-
-- Размер раздела: 12 гигабайт,
-
-   Размер занятого пространства: 4.8 гигабайт,
-
-   Размер свободного пространства: 6 гигабайт, 45%.
-
-   Тип файловой системы для раздела / - ext4
-
-## Part 12. Использование утилиты du
-
-- Запуск команды du:
-
-   ![du](./Screenshots/du.png)
-
-- Размер папки /home:
-
-   ![du home](./Screenshots/duHome.png)
-
-- Размер папки /var:
-
-   ![du var](./Screenshots/duVar.png)
-
-- Размер папки /var/log:
-
-   ![du varlog](./Screenshots/duVarlog.png)
-
-- Размер всего содержимого в /var/log:
-
-   ![du varlog*](./Screenshots/duVarlog*.png)
-
-## Part 13. Установка и использование утилиты ncdu
-
-- Размер папки /home:
-
-   ![ncdu home](./Screenshots/ncduHome.png)
-
-- Размер папки /var:
-
-   ![ncdu var](./Screenshots/ncduVar.png)
-
-- Размер папки /var/log:
-
-   ![ncdu varlog](./Screenshots/ncduVarlog.png)
-
-## Part 14. Работа с системными журналами
-
-- Последний логин:
-
-   ![last Login](./Screenshots/lastLogin.png)
-
-- Время логина: 13:19:58
-
-   Имя пользователя: newuser
-
-   Метод входа в систему: ssh
-
-- Перезапуск SSHd:
-
-   ![restart SSHd](./Screenshots/restartSSHD.png)
-
-## Part 15. Использование планировщика заданий CRON
-
-- Добавление задачи в CRON. Вписывается в конец файла, после выполнения команды crontab -e:
-
-   ![cron Tasks](./Screenshots/cronTasks.png)
-
-- Результат выполнения:
-
-   ![cron Result](./Screenshots/cronResult.png)
-
-- Очищаем список задач командой crontab -r и выводим все текущие задачи:
-
-   ![Removing And Showing cron tasks](./Screenshots/removingAndShowing.png)
+- ![Смотрим](./images/Part6/result.png)

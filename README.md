@@ -1,350 +1,242 @@
-# UNIX/Linux operating systems (Basic).
+# Simple Docker
 
-Linux system installation and updates. Administration basics.
+Introduction to docker. Developing a simple docker image for your own server.
 
----
-
->💡 If this is your very first project, fill out this [form](http://opros.so/kAnXy).
-
->💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) to leave your feedback on the project. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
+💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
 ## Contents
 
 1. [Chapter I](#chapter-i)
 2. [Chapter II](#chapter-ii) \
-   2.1. [Linux](#linux)  
-   2.2. [Administration](#administration)  
-   2.3. [Virtual machines](#virtual-machines)
+    2.1. [nginx](#nginx) \
+    2.2. [Docker](#docker) \
+    2.3. [Dockle](#dockle)
 3. [Chapter III](#chapter-iii) \
-   3.1 [Installation of the OS](#part-1-installation-of-the-os)  
-   3.2 [Creating a user](#part-2-creating-a-user)  
-   3.3 [Setting up the OS network](#part-3-setting-up-the-os-network)   
-   3.4 [OS Update](#part-4-os-update)  
-   3.5 [Using the sudo command](#part-5-using-the-sudo-command)  
-   3.6 [Installing and configuring the time service](#part-6-installing-and-configuring-the-time-service)  
-   3.7 [Installing and using text editors](#part-7-installing-and-using-text-editors)  
-   3.8 [Installing and basic setup of SSHD service](#part-8-installing-and-basic-setup-of-the-sshd-service)  
-   3.9 [Installing and using the top, htop utilities](#part-9-installing-and-using-the-top-htop-utilities)   
-   3.10 [Using the fdisk utility](#part-10-using-the-fdisk-utility)   
-   3.11 [Using the df utility](#part-11-using-the-df-utility)    
-   3.12 [Using the du utility](#part-12-using-the-du-utility)    
-   3.13 [Installing and using the ncdu utility](#part-13-installing-and-using-the-ncdu-utility)    
-   3.14 [Working with system logs](#part-14-working-with-system-logs)     
-   3.15 [Using the CRON job scheduler](#part-15-using-the-cron-job-scheduler)
+    3.1. [Ready-made docker](#part-1-ready-made-docker) \
+    3.2. [Operations with container](#part-2-operations-with-container) \
+    3.3. [Mini web server](#part-3-mini-web-server) \
+    3.4. [Your own docker](#part-4-your-own-docker) \
+    3.5. [Dockle](#part-5-dockle) \
+    3.6. [Basic Docker Compose](#part-6-basic-docker-compose)
 
+## Instructions
+
+How to learn at “School 21”:
+
+- Here, you’ll find a unique learning experience with a lot of freedom. You’re given a task and left to find your own way to solve it, using whatever resources work best for you — whether that’s the Internet or AI tools like GigaChat. Just be mindful of information quality: verify, think critically, analyze, and compare.
+- Peer-to-peer (P2P) learning is the exchange of knowledge and experience with peers, where everyone acts as both mentor and student. This approach allows you to gain a deeper understanding of the material by learning from one another.
+- Feel free to ask for help: around you are peers who are also navigating this path for the first time. Share your own experience and ideas with others.  Join Rocket.Chat to stay updated with the latest community announcements. 
+- Your learning is meaningless if you just copy someone else’s solutions. When receiving help from others, always make sure you fully understand the “why”, “how”, and “purpose” behind the solution. Don’t be afraid to make mistakes. 
+- Does the task seem impossible? Take a break, get some fresh air and clear your mind — this has helped many people. Maybe after that, the solution will come to you naturally.
+- The learning process is just as important as the result. It’s not just about completing the task — it’s about understanding HOW to solve it. 
+
+How to work with the project:
+
+- Before starting, clone the project from GitLab into a repository with the same name.
+- All files should be created inside the _src/_ folder of the cloned repository.
+- After cloning the project, create a _develop_ branch and do all your development there. Then, push the _develop_ branch to GitLab.
+- Your directory should not contain any files other than those specified in the assignments.
 
 ## Chapter I
 
-![linux](misc/images/linux.png)
+![simple_docker](misc/images/simple_docker.png)
 
->Developer’s note: \
->For full immersion, you can play your favorite jazz song while reading the assignment.
+Planet Earth, somewhere in the middle of the sea, today.
 
-Planet Earth, Seb's Jazz Club, today.
+You never liked to move. Lots of fuss, little action. But you managed to find a great job in another city to immerse yourself in the DevOps world.
+And you're not one to let a little trouble ruin your plans.
 
-"Well, Sebastian, you didn't expect me to believe that you called me just to sit and relax, did you? You're not the type to write to an old comrade in the middle of the working week when you have nothing to say."
+From your cabin window, you hear the sound of the waves, the ship peacefully rocking on them, and you remember your favourite novel about the sea — "Moby Dick".
+Although the plot is far from straightforward, with many lyrical digressions and philosophical musings, you, like everyone else, associate this book primarily with Moby Dick himself — the white whale.
 
-"Nothing can ever be kept from you! I thought I'd get to the point, but since you're so sharp..."
-
-"Stop flattering me, I'm just wondering why we're here."
-
-"The thing is, I recently joined a development company that needed an administrator. But there is problem: they use Linux as their operating system."
-
-"And you, as a confident Windows user, want to understand the basics of Linux and also the administration?"
-
-"Exactly! As far as I remember, you're good at both."
-
-"Well, then, get your laptop! Obviously I haven't done this for a while, but I'll try to help. The main thing is to finish before the club closes, otherwise we'll have to continue tomorrow."
-
-\> *The song ends, the music slowly fades, they bring you the drinks you ordered.*
-
-\> *While Sebastian takes his laptop out and turns it on, you decide to share a little historical background.*
+"Hmm... White whale..." This is where you remember that during the long voyage you wanted to work on the dock.
 
 
 ## Chapter II
 
-### Linux
+### **nginx**
 
-"The history of Linux dates back to 1991, when a Finnish graduate programmer named Linus Torvalds began working on his own operating system kernel.
+**nginx** (pronounced "engine-x") is an open-source reverse proxy server for HTTP, HTTPS, etc. **nginx** is also used as a load balancer, web server and for HTTP caching. The **nginx** project focuses on high parallelism, high performance and low memory usage.
 
-He put his work on a public server and it became a milestone in the history of Linux. First dozens, then hundreds and thousands of developers supported his project, and that's how a complete operating system was born.
 
-The first official version, Linux 1.0, was released in 1994. From the beginning to the present day, Linux has been distributed as free software under the GPL licence. This means that the source code of the operating system can be viewed by anyone - and not just viewed, but modified. The only condition is that the modified code must also be available to everyone and distributed under the GPL. This is important because it allows developers to use the code without worrying about copyright issues.
+**nginx** has one main process and several worker processes.
+The primary task of the main process is to read and check the configuration and manage the worker processes.
+The worker processes perform the actual processing of the requests.
 
-Today, Linux is the most popular and widely used open source operating system. As an operating system, Linux is software that sits below other software on a computer, receiving requests from those programs and passing those requests on to the computer's hardware."
+How **nginx** and its modules work is defined in the configuration file. By default, the configuration file is called *nginx.conf*
 
-\> *The waitress brings you the drinks you ordered, the musicians start playing again.*
+### **Docker**
 
-### Administration
+A container is a new "executable file" that includes all the dependencies the product needs.
 
-"Administration, without going into too much detail, is the support and improvement of all computer and office equipment, peripherals, network connectivity, etc. When administering Linux, most of the work is done in the terminal, so it's better to start with the basic utilities."
+The main advantage of containerisation is the isolation of dependencies and a single, simple software start-up point.
 
-\> *At this point Sebastian's laptop boots up and you see a horrible picture: it doesn't even have the right operating system...*
+Basic terms:
+- Docker image — the "package" for the application and dependencies (including system ones).
+- Container — an instance of an image, i.e. a 'alive' image.
 
-\> *Instead of reinstalling Sebastian's operating system, you decide to use a virtual machine.*
+**Docker** is a platform that is designed to develop, deploy and run applications in containers.
+**Docker** is the 'de-facto' standard containerisation tool in the industry, but it is not the first or last among containerisation technologies.
 
-### Virtual machines
+The forerunners of **Docker** containers were virtual machines.
+A virtual machine, like a container, isolates the application and its dependencies from the outside environment.
+However, **Docker** containers have advantages over virtual machines.
+For example, they are very easy to port, consume fewer resources, start and run faster.
 
-"A virtual machine (VM) is just like a physical computer, it has a CPU, memory, disks for storing files, and can connect to the Internet if necessary. The only difference is that the components of your computer (the hardware) are tangible, while virtual machines exist only as code.
+A docker image consists of layers. Each layer describes some change to be performed to the data on the running container.
+The structure of links between layers is hierarchical. There is a base layer on which the other layers are "overlaid".
+The *Dockerfile* is used to create an image. Each instruction in it creates a new layer.
 
-To put it simply, it's a virtual computer on which you can install an operating system and all the associated software, with no changes to your main operating system.
+### **Dockle**
 
-Virtualisation is the process of creating a software (virtual) version of a computer with dedicated CPU, memory and storage resources that are 'borrowed' from a physical computer. A virtual machine is a computer file (image) that works like a normal computer.
+**Dockle** is a container image security checking tool that can be used to find vulnerabilities.
 
-_VirtualBox_ is a virtualisation software product, i.e. a tool for creating virtual machines."
+Key features and benefits of **Dockle**:
+- searches for vulnerabilities in images;
+- helps in creating a proper Dockerfile;
+- easy to use, you only need to specify the image name;
+- support for *CIS Benchmarks*.
 
-\> *You wanted to share some more useful information later, so you created a materials folder on Sebastian's laptop with useful information.*
+### **Docker Compose**
+
+Docker Compose is a tool for handling tasks related to projects deployment.
+Docker Compose can be helpful if several services are used to keep the project running.
+
+Docker Compose is used to simultaneously manage multiple containers that are part of an application.
+This tool offers the same features as Docker, but allows to work with more complex distributed applications, e.g. microservices.
 
 
 ## Chapter III
 
-As a result of the work you should provide a report with completed tasks. Each part of the task describe what should be added to the report once it has been completed. This can be screenshots, some data, etc.
+As a result of the work you should provide a report on the first two tasks. Each part of the task describe what should be added to the report once it has been completed. This can be answers to questions, screenshots, etc.
+
+As a result of the third task you should provide source files for running the web server.
+
+As a result of the fourth and fifth tasks you should provide dockerfiles.
+
+As a result of the sixth task you should provide a *docker-compose.yml* file and the dockerfiles needed to run it (if not provided earlier).
 
 - A report with a .md extension must be uploaded to the repository, in the src folder;
-- All parts of the task should be highlighted in the report as level 2 headers;
+- All parts of the task should be highlighted in the report as level 2 headings;
 - Within one part of the task, everything that is added to the report must be in the form of the list;
 - Each screenshot in the report must be briefly captioned (what’s in the screenshot);
-- All screenshots must be cropped so that only the relevant part of the screen is shown.
+- All screenshots must be cropped so that only the relevant part of the screen is shown;
+- It’s allowed to have several task points shown in one screenshot, but they must all be described in the caption;
+- Source files for running the web server from the third task should be uploaded to the repository, in the src/server folder;
+- Dockerfiles from the fourth and fifth tasks should be uploaded to the repository, in the src folder;
+- *docker-compose.yml* from the sixth task should be uploaded to the repository, in the src folder;
+- Be prepared to demonstrate your work if necessary.
 
-## Part 1. Installation of the OS
+## Part 1. Ready-made docker
 
-"Well, let's finally get this Linux installed, Sebastian moves the laptop closer to you."
-
-"Yes, it's about time. I saw a great instruction on *Linuxconfig* to install the version we need."
-
-**== Task ==**
-
-##### Install **Ubuntu 20.04 Server LTS** without GUI. (Use VirtualBox).
-- There should be no GUI.
-- Check Ubuntu version by running the command \
-  `cat /etc/issue`
-- Add a screenshot of the command output to the report.
-
-## Part 2. Creating a user
-
-"An installed system is a good thing, but what if someone else uses it? I'll teach you how to create a new user."
+As the final goal of your little practice you have immediately chosen to write a docker image for your own web server, so first you need to deal with a ready-made docker image for the server.
+You chose a pretty simple **nginx**.
 
 **== Task ==**
 
-##### Create a user other than the one created during installation. The user must be added to `adm` group.
-- Add a screenshot of command call to create user.
-- The new user must be in the output of the command: \
-  `cat /etc/passwd`
-- Add a screenshot of the command output.
+##### Take the official docker image from **nginx** and download it using `docker pull`.
+##### Check for the docker image with `docker images`.
+##### Run docker image with `docker run -d [image_id|repository]`.
+##### Check that the image is running with `docker ps`.
+##### View container information with `docker inspect [container_id|container_name]`.
+##### From the command output define and write in the report the container size, list of mapped ports and container ip.
+##### Stop docker container with `docker stop [container_id|container_name]`.
+##### Check that the container has stopped with `docker ps`.
+##### Run docker with ports 80 and 443 in container, mapped to the same ports on the local machine, with *run* command.
+##### Check that the **nginx** start page is available in the browser at *localhost:80*.
+##### Restart docker container with `docker restart [container_id|container_name]`.
+##### Check in any way that the container is running.
 
-## Part 3. Setting up the OS network
+- Add the following screenshots to the report:
+    - the call and output of all commands used in this part of the task;
+    - **nginx** start page at *localhost:80* (address must be shown).
+    
+*Note:* **Don't upload heavy files (>10 mb) to git.**
 
-"In our world, you can't go far without the Internet. However, since we want to train you for the role of a system administrator, I'll show you a little more than just setting up a network."
+## Part 2. Operations with container
 
-"Before we begin, I suggest reading about network interfaces and DHCP."
-
-**== Task ==**
-
-##### Set the machine name as user-1
-##### Set the time zone corresponding to your current location.
-
-##### Output the names of the network interfaces using a console command.
-- In the report give an explanation for the presence of the lo interface.
-##### Use the console command to get the ip address of the device you are working on from the DHCP server.
-- Decode DHCP in the report.
-##### Define and display the external ip address of the gateway (ip) and the internal IP address of the gateway, aka default ip address (gw).
-##### Set static (manually set, not received from DHCP server) ip, gw, dns settings (use public DNS servers, e.g. 1.1.1.1 or 8.8.8.8).
-
-##### Reboot the virtual machine. Make sure that the static network settings (ip, gw, dns) correspond to those set in the previous point.
-- Describe in the report what you have done to complete all seven points (you can do it in text or with screenshots);
-- Successfully ping 1.1.1.1 and ya.ru remote hosts and add a screenshot of the output command to the report. There should be "0% packet loss" phrase in command output.
-
-## Part 4. OS Update
-
-"You're probably wondering, 'Is the system ready now?' It's not ready at all! We haven't updated it to the latest version yet."
+Docker image and container are ready. Now we can look into **nginx** configuration and display page status.
 
 **== Task ==**
 
-##### Update the system packages to the latest version
-- After updating the system packages, if you enter the update command again, a message should appear saying there are no updates;
-- Add a screenshot of this message to the report.
+##### Read the *nginx.conf* configuration file inside the docker container with the *exec* command.
+##### Create a *nginx.conf* file on a local machine.
+##### Configure it on the */status* path to return the **nginx** server status page.
+##### Copy the created *nginx.conf* file inside the docker image using the `docker cp` command.
+##### Restart **nginx** inside the docker image with *exec*.
+##### Check that *localhost:80/status* returns the **nginx** server status page.
+##### Export the container to a *container.tar* file with the *export* command.
+##### Stop the container.
+##### Delete the image with `docker rmi [image_id|repository]` without removing the container first.
+##### Delete stopped container.
+##### Import the container back using the *import* command.
+##### Run the imported container.
+##### Check that *localhost:80/status* returns the **nginx** server status page.
 
-## Part 5. Using the **sudo** command
+- Add the following screenshots to the report:
+    - the call and output of all commands used in this part of the task;
+    - the contents of the created *nginx.conf* file;
+    - the **nginx** server status page at *localhost:80/status*.
 
-"How often were you told as a child that you forgot to say the 'magic' word? One of those 'magic' words was 'please'. Linux has its counterpart – _sudo_. The system won't perform some operations until it hears the 'magic' word."
 
-**== Task ==**
+## Part 3. Mini web server
 
-##### Allow user created in [Part 2](#part-2-creating-a-user) to execute sudo command.
-- In the report explain the *true* purpose of sudo command (don’t write about the fact that this word is "magic" one);
-- Change the OS hostname via the user created in [Part 2](#part-2-creating-a-user) (using sudo);
-- Add screenshot with changed hostname to the report.
-
-## Part 6. Installing and configuring the time service
-
-"Although we have the correct time now, it may not always be that way. To avoid having to set it every time yourself, there are time sync services."
-
-**== Task ==**
-
-##### Set up the automatic time synchronisation service.
-- Output the time of the time zone in which you are currently located.
-- The output of the following command must contain `NTPSynchronized=yes`: \
-  `timedatectl show`
-- Add screenshots of the correct time and command output to the report.
-
-## Part 7. Installing and using text editors
-
-"I think we're ready to move on to one of the scariest parts."
-
-You’re pointing toward the Netherlands on the map of the world hanging on the wall.
-
-"Here, Bram Moolenaar has unraveled the mysteries of harmony and inner concentration. \
-This is where the first version of VIM was released on 2 November 1991. \
-Do you want to learn how to work in VIM?"
-
-"Yes..."
-
-"Then I am your master."
-
-"OK..."
-
-"Just don't cry."
-
-"I won’t..."
+It's time to take a little break from the docker to prepare for the last stage. It's time to write your own server.
 
 **== Task ==**
 
-##### Install **VIM** text editor (+ any two others if you like **NANO**, **MCEDIT**, **JOE** etc.)
+##### Write a mini server in **C** and **FastCgi** that will return a simple page saying `Hello, World!`.
+##### Run the written mini server via *spawn-fcgi* on port 8080.
+##### Write your own *nginx.conf* that will proxy all requests from port 81 to *127.0.0.1:8080*.
+##### Run **nginx** locally with the written configuration.
+##### Check that browser on *localhost:81* returns the page you wrote.
+##### Put the *nginx.conf* file under *./nginx/nginx.conf* (you will need this later).
 
-##### Using each of the three selected editors, create a *test_X.txt* file, where X is the name of the editor in which the file is created. Write your nickname in it, close the file and save the changes.
-- Add screenshots to the report:
-    - Of each editor with the contents of the file before closing;
-- Write down in the report what you have done to exit with the changes saved.
+## Part 4. Your own docker
 
-##### Using each of the three selected editors, open the file for editing, edit the file by replacing the nickname with the "21 School 21" string, close the file without saving the changes.
-- Add screenshots to the report:
-    - Of each editor with the contents of the file after editing;
-- Write down in the report what you have done to exit without saving the changes.
-##### Using each of the three selected editors, edit the file again (similar to the previous point) and then master the functions of searching through the contents of a file (a word) and replacing a word with any other one.
-- Add screenshots to the report:
-    - Of each editor with word search results;
-    - Of each editor with commands entered to replace a word with another.
-
-## Part 8. Installing and basic setup of the **SSHD** service
-
-"It's convenient to have access from one computer to another over a network, isn't it? But to make it not only convenient, but also safe, you should use SSH service."
+Now everything is ready. You can start writing the docker image for the created server.
 
 **== Task ==**
 
-##### Install the SSHd service.
-##### Add an auto-start of the service whenever the system boots.
-##### Reset the SSHd service to port 2022.
-##### Show the presence of the sshd process using the ps command. To do this, you need to match the keys to the command.
-- Explain in the report the meaning of the command and each key in it.
-##### Reboot the system.
-- Describe in the report what you have done to complete all five points (you can do this in text or with screenshots);
-- The output of the netstat -tan command should contain \
-  `tcp 0 0.0.0.0:2022 0.0.0.0:* LISTEN` \
-  (if there is no netstat command, it needs to be installed);
-- Add a screenshot of the command output to the report;
-- Explain the meaning of the -tan keys, the value of each output column, the value 0.0.0.0. in the report.
+*When writing a docker image avoid multiple calls of RUN instructions*
 
-## Part 9. Installing and using the **top**, **htop** utilities
+#### Write your own docker image that:
+##### 1) builds mini server sources on FastCgi from [Part 3](#part-3-mini- web-server);
+##### 2) runs it on port 8080;
+##### 3) copies inside the image written *./nginx/nginx.conf*;
+##### 4) runs **nginx**.
+_**nginx** can be installed inside the docker itself, or you can use a ready-made image with **nginx** as base._
+##### Build the written docker image with `docker build`, specifying the name and tag.
+##### Check with `docker images` that everything is built correctly.
+##### Run the built docker image by mapping port 81 to 80 on the local machine and mapping the *./nginx* folder inside the container to the address where the **nginx** configuration files are located (see [Part 2](#part-2-operations-with-container)).
+##### Check that the page of the written mini server is available on localhost:80.
+##### Add proxying of */status* page in *./nginx/nginx.conf* to return the **nginx** server status.
+##### Rebuild docker image.
+*If everything is done correctly, after saving the file and restarting the container, the configuration file inside the docker image should update itself without any extra steps
+##### Check that *localhost:80/status* now returns a page with **nginx** status.
 
-"If I were asked what useful things **top** and **htop** utilities do, I would answer in one word: everything."
+## Part 5. **Dockle**
 
-**== Task ==**
-
-##### Install and run the top and htop utilities.
-- From the output of the top command determine and write in the report:
-    - uptime
-    - number of authorised users
-    - average system load
-    - total number of processes
-    - cpu load
-    - memory load
-    - pid of the process with the highest memory usage
-    - pid of the process taking the most CPU time
-- Add a screenshot of the htop command output to the report:
-    - sorted by PID, PERCENT_CPU, PERCENT_MEM, TIME
-    - filtered for sshd process
-    - with the syslog process found by searching
-    - with hostname, clock and uptime output added
-
-## Part 10. Using the **fdisk** utility
-
-"Now let's figure out how to get information about your hard disk. Especially for you I've put together a couple of examples of how to use the fdisk utility."
+Once you've written the image, it's never a bad idea to check it for security.
 
 **== Task ==**
 
-##### Run the fdisk -l command.
-- In the report write the name of the hard disk, its capacity and number of sectors, and also the swap size.
+##### Check the image from the previous task with `dockle [image_id|repository]`.
+##### Fix the image so that there are no errors or warnings when checking with **dockle**.
 
-## Part 11. Using the **df** utility
 
-"We got the information about the hard disk, but often it is much more interesting to get information about the disk space, which can be obtained with the df utility."
+## Part 6. Basic **Docker Compose**
 
-**== Task ==**
-
-##### Run the df command.
-- In the report write for the root partition (/):
-    - partition size
-    - space used
-    - space free
-    - percentage used
-- Determine and write the measurement unit in the report.
-
-##### Run the df -Th command.
-- In the report write for the root partition (/):
-    - partition size
-    - space used
-    - space free
-    - percentage used
-- Determine and write the file system type for the partition in the report.
-
-## Part 12. Using the **du** utility
-
-"df is not the only way to get information about disk space. I'll tell you about another one."
+There, you've finished your warm-up. Wait a minute though...
+Why not try experimenting with deploying a project consisting of several docker images at once?
 
 **== Task ==**
 
-##### Run the du command.
-##### Output the size of the /home, /var, /var/log folders (in bytes, in human readable format)
-##### Output the size of all contents in /var/log (not the total, but each nested element using *)
-- Add screenshots with the output of all used commands to the report.
-
-## Part 13. Installing and using the **ncdu** utility
-
-"You probably didn’t like much the format in which the du command outputs information. I understand you perfectly. So now we'll take a look at its improved version."
-
-**== Task ==**
-
-##### Install the ncdu utility.
-##### Output the size of the /home, /var, /var/log folders.
-- The size should be approximately the same as in [Part 12](#part-12-using-the-du-utility);
-
-- Add screenshots of the used commands to the report.
-
-## Part 14. Working with system logs
-
-"A system administrator sometimes needs to review events which happened in a system in the recent past. Linux has system logs for that."
-
-**== Task ==**
-
-##### Open for viewing:
-##### 1. /var/log/dmesg
-##### 2. /var/log/syslog
-##### 3. /var/log/auth.log
-- Write the last successful login time, user name and login method in the report;
-- Restart SSHd service;
-- Add a screenshot of the service restart message to the report (search for it in the logs).
-
-## Part 15. Using the **CRON** job scheduler
-
-"Phew, we finally got to the last part of my long narrative. I will now show you the program, which, among other things, noticeably simplifies the periodic invocation of other programs."
-
-**== Task ==**
-
-##### Using the job scheduler, run the uptime command in every 2 minutes.
-- Find lines in the system logs (at least two within a given time range) about the execution;
-- Display a list of current jobs for CRON;
-- Add screenshots of the execution lines and the list of current tasks to the report.
-
-##### Remove all tasks from the job scheduler.
-- Add a screenshot of the list of current tasks for CRON to the report.
+##### Write a *docker-compose.yml* file, using which:
+##### 1) Start the docker container from [Part 5](#part-5-dockle) _(it must work on local network, i.e., you don't need to use **EXPOSE** instruction and map ports to local machine)_.
+##### 2) Start the docker container with **nginx** which will proxy all requests from port 8080 to port 81 of the first container.
+##### Map port 8080 of the second container to port 80 of the local machine.
+##### Stop all running containers.
+##### Build and run the project with the `docker-compose build` and `docker-compose up` commands.
+##### Check that the browser returns the page you wrote on *localhost:80* as before.
 
