@@ -50,7 +50,7 @@ end
 
    - Сгенерировать ssh-ключ для подключения к node01 из manager (без passphrase). 
 
-        - ![Генерируем ssh-ключ](./images/Part1/2/sshkeygen.png)
+        - ![Генерируем ssh-ключ](./images/Part1/2/sshKeygen.png)
 
    - Скопировать на manager docker-compose файл и исходный код микросервисов. (Используй проект из папки src и docker-compose файл из предыдущей главы. Помощь по ssh в материалах.)
         
