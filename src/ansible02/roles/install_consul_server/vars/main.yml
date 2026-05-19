@@ -1,0 +1,9 @@
+---
+consul_version: "1.17.3"
+consul_architecture: "amd64"  # или arm64
+consul_download_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_{{ consul_architecture }}.zip"
+consul_zip_name: "consul_1.17.3_linux_amd64.zip"
+consul_user: "consul"
+consul_group: "consul"
+consul_config_dir: "/etc/consul.d"
+consul_data_dir: "/opt/consul"

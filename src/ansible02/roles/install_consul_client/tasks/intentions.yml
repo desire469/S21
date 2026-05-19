@@ -1,0 +1,22 @@
+---
+- name: Create intention for API to access DB
+  shell: |
+    /usr/local/bin/consul intention create api db || /usr/local/bin/consul intention create -replace api db
+  args:
+    executable: /bin/bash
+  run_once: true
+  delegate_to: "{{ groups['consul_server'][0] }}"
+  when: is_api or is_db
+
+- name: Verify intention was created
+  shell: |
+    /usr/local/bin/consul intention get api db
+  register: intention_check
+  run_once: true
+  delegate_to: "{{ groups['consul_server'][0] }}"
+  ignore_errors: yes
+
+- name: Display intention status
+  debug:
+    msg: "Intention api -> db: {{ 'created' if intention_check.rc == 0 else 'failed' }}"
+  run_once: true

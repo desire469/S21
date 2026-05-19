@@ -1,0 +1,57 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install Apache2
+  apt:
+    name:
+      - apache2
+      - apache2-utils
+    state: present
+
+- name: Ensure Apache is started and enabled
+  systemd:
+    name: apache2
+    state: started
+    enabled: yes
+
+- name: Copy custom index.html
+  template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    owner: www-data
+    group: www-data
+    mode: '0644'
+
+- name: Configure Apache port
+  replace:
+    path: /etc/apache2/ports.conf
+    regexp: '^Listen 80'
+    replace: 'Listen {{ apache_port }}'
+
+- name: Configure virtual host port
+  replace:
+    path: /etc/apache2/sites-available/000-default.conf
+    regexp: ':80'
+    replace: ':{{ apache_port }}'
+
+- name: Allow Apache through firewall (if ufw is active)
+  ufw:
+    rule: allow
+    port: "{{ apache_port }}"
+    proto: tcp
+  ignore_errors: yes
+
+- name: Check if Apache is running
+  uri:
+    url: "http://localhost:{{ apache_port }}"
+    status_code: 200
+  register: apache_test
+  ignore_errors: yes
+
+- name: Display Apache status
+  debug:
+    msg: "Apache is running on port {{ apache_port }}"
+  when: apache_test.status == 200

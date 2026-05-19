@@ -1,0 +1,26 @@
+---
+- name: Find Vagrant private network IP (192.168.56.x)
+  set_fact:
+    consul_server_ip: "{{ ansible_facts['all_ipv4_addresses'] | select('match', '^192\\.168\\.56\\.') | first }}"
+  when: ansible_facts['all_ipv4_addresses'] | select('match', '^192\\.168\\.56\\.') | list | length > 0
+
+- name: Fallback to eth1 interface if available
+  set_fact:
+    consul_server_ip: "{{ ansible_eth1.ipv4.address }}"
+  when: 
+    - consul_server_ip is not defined
+    - ansible_eth1 is defined
+
+- name: Final fallback to default IP
+  set_fact:
+    consul_server_ip: "{{ ansible_default_ipv4.address }}"
+  when: consul_server_ip is not defined
+
+- name: Debug the detected IP
+  debug:
+    msg: "Detected Consul client IP: {{ consul_server_ip }}"
+
+- name: Fail if IP is 10.0.2.15 (NAT interface)
+  fail:
+    msg: "Detected NAT IP 10.0.2.15. Please check network configuration."
+  when: consul_server_ip == "10.0.2.15"

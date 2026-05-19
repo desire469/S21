@@ -1,0 +1,178 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install dependencies
+  apt:
+    name:
+      - unzip
+      - wget
+      - systemd
+      - gnupg
+      - tar
+      - xz-utils
+    state: present
+
+- name: Create consul group
+  group:
+    name: "{{ consul_group }}"
+    system: yes
+    state: present
+
+- name: Create consul user
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    system: yes
+    shell: /bin/false
+    create_home: no
+    home: "{{ consul_data_dir }}"
+
+- name: Create consul directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0755'
+  loop:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+
+- name: Copy Consul zip
+  copy:
+    src: "/home/vagrant/src/{{ consul_zip_name }}"
+    dest: "/tmp/{{ consul_zip_name }}"
+    mode: '0644'
+
+- name: Unzip Consul binary
+  unarchive:
+    src: "/tmp/{{ consul_zip_name }}"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    mode: '0755'
+
+- name: Download Envoy binary
+  get_url:
+    url: "{{ envoy_download_url }}"
+    dest: "/tmp/envoy-{{ envoy_version }}-linux-x86_64"
+    mode: '0755'
+
+- name: Install Envoy binary
+  copy:
+    src: "/tmp/envoy-{{ envoy_version }}-linux-x86_64"
+    dest: "/usr/local/bin/envoy"
+    remote_src: yes
+    mode: '0755'
+
+- name: Copy Consul client configuration
+  template:
+    src: consul_client.hcl.j2
+    dest: "{{ consul_config_dir }}/consul.hcl"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0644'
+  when: true
+
+- name: Stop Consul using killall
+  shell: sudo killall consul || true
+  changed_when: false
+  ignore_errors: yes
+
+- name: Stop Envoy using killall
+  shell: sudo killall envoy || true
+  changed_when: false
+  ignore_errors: yes
+
+- name: Wait 5 seconds for processes to fully terminate
+  pause:
+    seconds: 5
+  changed_when: false
+
+- name: Set service port based on hostname
+  set_fact:
+    service_port: >-
+      {{
+        8081 if 'api' in ansible_hostname or 'api' in inventory_hostname
+        else 5432 if 'db' in ansible_hostname or 'db' in inventory_hostname
+        else 8080
+      }}
+
+- name: Set service type
+  set_fact:
+    is_api: "{{ 'api' in ansible_hostname or 'api' in inventory_hostname }}"
+    is_db: "{{ 'db' in ansible_hostname or 'db' in inventory_hostname }}"
+
+- name: Copy service configuration for API with upstream
+  template:
+    src: api-service.json.j2     
+    dest: "{{ consul_config_dir }}/{{ ansible_hostname }}-service.json"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0644'
+  when: is_api
+
+- name: Copy service configuration for DB without upstream
+  template:
+    src: db-service.json.j2
+    dest: "{{ consul_config_dir }}/db-service.json"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0644'
+  when: is_db
+
+- name: Start Consul in background
+  shell: |
+    nohup /usr/local/bin/consul agent -config-dir={{ consul_config_dir }} > /var/log/consul.log 2>&1 &
+  args:
+    executable: /bin/bash
+  async: 10
+  poll: 0
+
+- name: Wait for Consul to start
+  wait_for:
+    port: 8500
+    host: "127.0.0.1"
+    delay: 5
+    timeout: 60
+    state: started
+
+- name: Verify Consul is running
+  shell: |
+    /usr/local/bin/consul members
+  register: consul_members
+  changed_when: false
+
+- name: Register service with sidecar via config file
+  shell: |
+    /usr/local/bin/consul services register {{ consul_config_dir }}/{{ ansible_hostname }}-service.json
+  args:
+    executable: /bin/bash
+    
+- name: Start Envoy sidecar
+  shell: |
+    nohup /usr/local/bin/consul connect envoy \
+      -sidecar-for={{ ansible_hostname }} \
+      -admin-bind=127.0.0.1:19000 \
+      -address 0.0.0.0:{{ 20000 if 'api' in ansible_hostname else 21000 }} \
+      > /var/log/consul-envoy-{{ ansible_hostname }}.log 2>&1 &
+  args:
+    executable: /bin/bash
+  async: 10
+  poll: 0
+
+- name: Display Consul members
+  debug:
+    msg: "{{ consul_members.stdout_lines }}"
+    
+- name: Display registered services
+  shell: |
+    /usr/local/bin/consul catalog services
+  register: services
+  changed_when: false
+
+
+
+

@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Apache Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Welcome to Apache Web Server!</h1>
+        <p>Server deployed by Ansible on {{ ansible_hostname }}</p>
+        <p>Server IP: {{ ansible_default_ipv4.address }}</p>
+        <p>Current time: {{ ansible_date_time.time }}</p>
+        <p>Apache is running successfully!</p>
+    </div>
+</body>
+</html>

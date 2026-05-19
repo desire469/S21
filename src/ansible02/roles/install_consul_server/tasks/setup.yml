@@ -1,0 +1,108 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install dependencies
+  apt:
+    name:
+      - unzip
+      - wget
+      - systemd
+      - gnupg
+    state: present
+
+- name: Create consul group
+  group:
+    name: "{{ consul_group }}"
+    system: yes
+    state: present
+
+- name: Create consul user
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    system: yes
+    shell: /bin/false
+    create_home: no
+
+- name: Create consul directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0755'
+  loop:
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+
+- name: Copy Consul zip
+  copy:
+    src: "/home/vagrant/src/{{ consul_zip_name }}"
+    dest: "/tmp/{{ consul_zip_name }}"
+    mode: '0644'
+
+- name: Unzip Consul binary
+  unarchive:
+    src: "/tmp/{{ consul_zip_name }}"
+    dest: "/usr/local/bin"
+    remote_src: yes
+    mode: '0755'
+
+- name: Copy Consul server configuration
+  template:
+    src: consul_server.hcl.j2
+    dest: "{{ consul_config_dir }}/consul.hcl"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    mode: '0644'
+  when: true
+
+- name: Stop Consul using killall
+  shell: sudo killall consul || true
+  changed_when: false
+  ignore_errors: yes
+
+- name: Start Consul server in background
+  shell: |
+    nohup /usr/local/bin/consul agent -server -config-dir={{ consul_config_dir }} > /var/log/consul.log 2>&1 &
+  args:
+    executable: /bin/bash
+  environment:
+    CONSUL_HTTP_ADDR: "127.0.0.1:8500"
+  async: 10
+  poll: 0
+
+- name: Wait for Consul to start
+  wait_for:
+    port: 8500
+    host: "127.0.0.1"
+    delay: 5
+    timeout: 30
+    state: started
+
+- name: Verify Consul is running
+  shell: |
+    /usr/local/bin/consul members
+  register: consul_members
+  changed_when: false
+
+- name: Register service with hostname
+  shell: |
+    /usr/local/bin/consul services register \
+      -name={{ ansible_hostname }} \
+      -port=8080 \
+      -address={{ consul_server_ip }}
+  args:
+    executable: /bin/bash
+
+- name: Display Consul members
+  debug:
+    msg: "{{ consul_members.stdout_lines }}"

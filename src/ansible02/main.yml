@@ -1,0 +1,36 @@
+---
+
+- name: Setup Consul server
+  hosts: consul_server
+  become: yes
+  tags: [consul, server]
+  roles:
+    - install_consul_server
+  vars:
+    run_setup: true
+    run_intentions: false
+
+- name: Setup Consul client
+  hosts: consul_client
+  become: yes
+  tags: [consul, client, postgre]
+  roles:
+    - install_consul_client
+  vars:
+    run_setup: true
+    run_intentions: true
+
+- name: Setup PostgreSQL database
+  hosts: db
+  become: yes
+  tags: [postgre]
+  roles:
+    - install_db
+
+- name: Setup Hotels server
+  hosts: hotels_service
+  become: yes
+  tags: [hotels]
+  roles:
+    - install_hotels_service
+

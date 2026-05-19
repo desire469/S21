@@ -1,0 +1,17 @@
+{
+    "service": {
+      "name": "{{ ansible_hostname }}",
+      "port": {{ service_port }},
+      "address": "{{ consul_client_ip }}",
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "config": {
+              "bind_address": "0.0.0.0",
+              "bind_port": 21000
+            }
+          }
+        }
+      }
+    }
+  }

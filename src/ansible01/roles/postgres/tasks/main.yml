@@ -1,0 +1,113 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install PostgreSQL
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - python3-psycopg2
+      - acl
+    state: present
+
+- name: Ensure PostgreSQL is running and enabled
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Wait for PostgreSQL to start
+  wait_for:
+    port: 5432
+    timeout: 30
+
+- name: Set PostgreSQL password for postgres user
+  become_user: postgres
+  postgresql_user:
+    name: postgres
+    password: "{{ postgres_password }}"
+    encrypted: yes
+  no_log: true
+
+- name: Create database
+  become_user: postgres
+  postgresql_db:
+    name: "{{ database_name }}"
+    state: present
+
+- name: Create database user
+  become_user: postgres
+  postgresql_user:
+    name: "{{ database_user }}"
+    password: "{{ database_user_password }}"
+    encrypted: yes
+    role_attr_flags: LOGIN
+
+- name: Grant privileges to user
+  become_user: postgres
+  postgresql_privs:
+    db: "{{ database_name }}"
+    privs: ALL
+    type: database
+    role: "{{ database_user }}"
+
+- name: Copy SQL script to create table and insert data
+  copy:
+    src: init.sql
+    dest: /tmp/init.sql
+    owner: postgres
+    group: postgres
+    mode: '0600'
+
+- name: Execute SQL script using psql command
+  become_user: postgres
+  shell: |
+    psql -d {{ database_name }} -f /tmp/init.sql
+  register: sql_result
+
+- name: Show SQL execution result
+  debug:
+    msg: "{{ sql_result.stdout_lines }}"
+
+- name: Verify table was created
+  become_user: postgres
+  postgresql_query:
+    db: "{{ database_name }}"
+    query: "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '{{ table_name }}')"
+  register: table_check
+
+- name: Display table creation status
+  debug:
+    msg: "Table '{{ table_name }}' exists: {{ table_check.query_result }}"
+
+- name: Verify data was inserted
+  become_user: postgres
+  postgresql_query:
+    db: "{{ database_name }}"
+    query: "SELECT COUNT(*) as count FROM {{ table_name }}"
+  register: data_check
+
+- name: Display number of records
+  debug:
+    msg: "Table '{{ table_name }}' has {{ data_check.query_result[0].count }} records"
+
+- name: Query and display all records
+  become_user: postgres
+  postgresql_query:
+    db: "{{ database_name }}"
+    query: "SELECT id, first_name, last_name, position, salary, department FROM {{ table_name }}"
+  register: all_records
+  ignore_errors: yes
+
+- name: Show all employees
+  debug:
+    msg: "{{ all_records.query_result }}"
+  when: all_records.query_result is defined
+
+- name: Clean up temp files
+  file:
+    path: /tmp/init.sql
+    state: absent

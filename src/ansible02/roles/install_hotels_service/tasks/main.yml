@@ -1,0 +1,88 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install OpenJDK 21 and Maven
+  apt:
+    name: 
+      - openjdk-21-jdk
+      - maven
+    state: present
+
+- name: Create hotel service directory
+  file:
+    path: "{{ hotel_service_dir }}"
+    state: directory
+
+- name: Copy hotel service source code
+  copy:
+    src: "/home/vagrant/src/services/hotel-service"
+    dest: "{{ hotel_service_dir }}/"
+
+- name: Build hotel service with Maven
+  shell: |
+    cd {{ hotel_service_dir }}/hotel-service
+    mvn clean package -DskipTests
+
+- name: Find built JAR file
+  find:
+    paths: "{{ hotel_service_dir }}/hotel-service/target"
+    patterns: "*.jar"
+    excludes: "*-sources.jar,*-javadoc.jar"
+  register: jar_files
+
+- name: Set JAR file path
+  set_fact:
+    jar_path: "{{ jar_files.files[0].path }}"
+  when: jar_files.files | length > 0
+
+- name: Stop Hotel Service using killall
+  shell: sudo killall "hotel-service-.*.jar" || true
+  changed_when: false
+  ignore_errors: yes
+
+- name: Run hotel service with environment variables
+  shell: |
+    cd {{ hotel_service_dir }}/hotel-service
+    export POSTGRES_HOST={{ db_host }}
+    export POSTGRES_PORT={{ db_port }}
+    export POSTGRES_DB={{ db_name }}
+    export POSTGRES_USER={{ db_user }}
+    export POSTGRES_PASSWORD={{ db_password }}
+    
+    nohup java -jar {{ jar_path }} > /home/vagrant/hotel-service.log 2>&1 &
+  args:
+    executable: /bin/bash
+  async: 10
+  poll: 0
+  vars:
+    db_host: "{{ POSTGRES_HOST }}"
+    db_port: "{{ POSTGRES_PORT }}"
+    db_name: "{{ POSTGRES_DB }}"
+    db_user: "{{ POSTGRES_USER }}"
+    db_password: "{{ POSTGRES_PASSWORD }}"
+
+- name: Wait a few seconds for service to start
+  pause:
+    seconds: 10
+
+- name: Check if hotel service is running
+  shell: ps aux | grep -v grep | grep "{{ jar_path }}"
+  register: service_check
+  ignore_errors: yes
+
+- name: Display service status
+  debug:
+    msg: "Hotel service is {{ 'running' if service_check.rc == 0 else 'not running' }}"
+
+- name: Wait for service to be ready
+  wait_for:
+    port: "{{ server_port }}"
+    host: "127.0.0.1"
+    delay: 5
+    timeout: 60
+  ignore_errors: yes
+  vars:
+    server_port: "8082"

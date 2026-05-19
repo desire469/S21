@@ -1,0 +1,78 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install PostgreSQL
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - python3-psycopg2
+      - acl
+    state: present
+
+- name: Ensure PostgreSQL is running and enabled
+  systemd:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Wait for PostgreSQL to start
+  wait_for:
+    port: 5432
+    timeout: 30
+
+- name: Set PostgreSQL password for postgres user
+  become_user: postgres
+  postgresql_user:
+    name: postgres
+    password: "{{ POSTGRES_PASSWORD }}"
+    encrypted: yes
+  no_log: true
+
+- name: Create database
+  become_user: postgres
+  postgresql_db:
+    name: "{{ POSTGRES_DB }}"
+    state: present
+
+- name: Create database user
+  become_user: postgres
+  postgresql_user:
+    name: "{{ POSTGRES_USER }}"
+    password: "{{ POSTGRES_PASSWORD }}"
+    encrypted: yes
+    role_attr_flags: LOGIN
+
+- name: Grant privileges to user
+  become_user: postgres
+  postgresql_privs:
+    db: "{{ POSTGRES_DB }}"
+    privs: ALL
+    type: database
+    role: "{{ POSTGRES_USER }}"
+
+- name: Copy SQL script to create table and insert data
+  copy:
+    src: init.sql
+    dest: /tmp/init.sql
+    owner: postgres
+    group: postgres
+    mode: '0600'
+
+- name: Execute SQL script using psql command
+  become_user: postgres
+  shell: |
+    psql -d {{ POSTGRES_DB }} -f /tmp/init.sql
+  register: sql_result
+
+- name: Show SQL execution result
+  debug:
+    msg: "{{ sql_result.stdout_lines }}"
+
+- name: Clean up temp files
+  file:
+    path: /tmp/init.sql
+    state: absent

@@ -1,0 +1,8 @@
+---
+postgres_version: 14
+postgres_user: postgres
+postgres_password: postgres
+database_name: mydatabase
+database_user: myuser
+database_user_password: mypassword
+table_name: employees

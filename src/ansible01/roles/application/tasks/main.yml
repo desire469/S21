@@ -1,0 +1,37 @@
+---
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install docker
+      apt:
+        name: docker.io
+        state: latest
+
+    - name: Install docker-compose
+      apt:
+        name: docker-compose
+        state: latest
+
+    - name: Copy docker-compose.yml to all nodes
+      copy:
+        src: /home/vagrant/src/docker-compose.yml
+        dest: /home/vagrant/docker-compose.yml
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+    - name: Log in to Docker Hub
+      docker_login:
+        registry_url: https://index.docker.io/v1/
+        username: "{{ docker_hub_username }}"
+        password: "{{ docker_hub_password }}"
+      no_log: true  
+      ignore_errors: yes
+      
+    - name: Start service
+      docker_compose:
+        project_src: /home/vagrant
+        state: present
+      register: compose_output

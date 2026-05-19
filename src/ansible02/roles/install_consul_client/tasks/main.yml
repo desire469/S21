@@ -1,0 +1,9 @@
+---
+- import_tasks: find_ip.yml
+  when: run_setup | default(true)
+
+- import_tasks: setup.yml
+  when: run_setup | default(true)
+
+- import_tasks: intentions.yml
+  when: run_intentions | default(false)

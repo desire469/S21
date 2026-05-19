@@ -1,0 +1,26 @@
+{
+    "service": {
+      "name": "{{ ansible_hostname }}",
+      "port": {{ service_port }},
+      "address": "{{ consul_client_ip }}",
+      "connect": {
+        "sidecar_service": {
+          "proxy": {
+            "config": {
+              "bind_address": "0.0.0.0",
+              "bind_port": 20000
+            },
+            "upstreams": [
+              {
+                "destination_name": "db",
+                "local_bind_port": 5432,
+                "config": {
+                  "protocol": "tcp"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
