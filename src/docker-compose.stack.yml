@@ -1,0 +1,280 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:17-alpine
+    volumes:
+      - ./services/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_DB: aliciaaz
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aliciaaz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - main
+      - shared         
+    logging:            
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  rabbit:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_PLUGINS: "rabbitmq_management rabbitmq_prometheus"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  hotel:
+    image: xedll/hotel-service
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: database:5432
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: hotels_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  loyalty:
+    image: xedll/loyalty-service
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: database:5432
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: balances_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  payment:
+    image: xedll/payment-service
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: database:5432
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  session:
+    image: xedll/session-service
+    depends_on:
+      - database
+    environment:
+      WAIT_FOR_HOSTS: database:5432
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  report:
+    image: xedll/report-service
+    depends_on:
+      - database
+      - rabbit
+    environment:
+      WAIT_FOR_HOSTS: database:5432 rabbit:5672
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_DB: statistics_db
+      RABBIT_MQ_HOST: rabbit
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  booking:
+    image: xedll/booking-service
+    depends_on:
+      - hotel
+      - payment
+      - loyalty
+      - database
+      - rabbit
+    environment:
+      WAIT_FOR_HOSTS: hotel:8082 payment:8084 loyalty:8085 database:5432 rabbit:5672
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"
+      HOTEL_SERVICE_HOST: hotel
+      HOTEL_SERVICE_PORT: 8082
+      PAYMENT_SERVICE_HOST: payment
+      PAYMENT_SERVICE_PORT: 8084
+      LOYALTY_SERVICE_HOST: loyalty
+      LOYALTY_SERVICE_PORT: 8085
+      POSTGRES_DB: reservations_db
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "password"
+      RABBIT_MQ_HOST: rabbit
+      RABBIT_MQ_PORT: 5672
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      RABBIT_MQ_QUEUE_NAME: messagequeue
+      RABBIT_MQ_EXCHANGE: messagequeue-exchange
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  gateway:
+    image: xedll/gateway-service
+    depends_on:
+      - session
+      - hotel
+      - booking
+      - loyalty
+      - payment
+      - report
+    environment:
+      WAIT_FOR_HOSTS: session:8081 hotel:8082 booking:8083 loyalty:8085 payment:8084 report:8086
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: "true"
+      SESSION_SERVICE_HOST: session
+      SESSION_SERVICE_PORT: 8081
+      HOTEL_SERVICE_HOST: hotel
+      HOTEL_SERVICE_PORT: 8082
+      BOOKING_SERVICE_HOST: booking
+      BOOKING_SERVICE_PORT: 8083
+      LOYALTY_SERVICE_HOST: loyalty
+      LOYALTY_SERVICE_PORT: 8085
+      PAYMENT_SERVICE_HOST: payment
+      PAYMENT_SERVICE_PORT: 8084
+      REPORT_SERVICE_HOST: report
+      REPORT_SERVICE_PORT: 8086
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:latest
+    configs:
+      - source: nginx_config
+        target: /etc/nginx/conf.d/default.conf
+    ports:
+      - "8087:8087"
+      - "8081:8081"
+      - "8083:8083"
+      - "15692:15692"
+    networks:
+      - main
+      - shared
+    logging:
+      driver: "loki"
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        loki-retries: "5"
+        loki-max-backoff: "1s"
+        max-size: "50m"
+        max-file: "3"
+
+configs:
+  nginx_config:
+    file: ./services/nginx/default.conf
+
+networks:
+  main:
+    driver: overlay
+  shared:
+    external: true

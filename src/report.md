@@ -1,182 +1,337 @@
-## Part 1. Готовый докер
 
-#### Возьми официальный докер-образ с nginx и выкачай его при помощи docker pull.
-
-- ![Скачивание официального nginx докер-образа](./images/Part1/1.png)
-
-#### Проверь наличие докер-образа через docker images.
-
-- ![Проверка наличия докер-образа](./images/Part1/2.png)
-
-#### Запусти докер-образ через docker run -d [image_id|repository].
-
-- ![Запуск образа](./images/Part1/3.png)
-
-#### Проверь, что образ запустился через docker ps.
-
-- ![Проверка запуска контейнера](./images/Part1/4.png)
-
-#### Посмотри информацию о контейнере через docker inspect [container_id|container_name].
-
-#### По выводу команды определи и помести в отчёт размер контейнера, список замапленных портов и ip контейнера.
-
-- ![Размер](./images/Part1/size.png)
-
-- ![Порты](./images/Part1/ports.png)
-
-- ![Айпи](./images/Part1/IP.png)
-
--  Размер: 160854769 байт, Список портов: 80/tcp, IP контейнера: 172.17.0.2
-
-#### Останови докер контейнер через docker stop [container_id|container_name].
-
-- ![Остановка контейнера](./images/Part1/5.png)
-
-#### Проверь, что контейнер остановился через docker ps.
-
-- ![Проверка остановки контейнера](./images/Part1/6.png)
-
-#### Запусти докер с портами 80 и 443 в контейнере, замапленными на такие же порты на локальной машине, через команду run.
-
-- ![Запуск контейнера с пробросом портов](./images/Part1/7.png)
-
-#### Проверь, что в браузере по адресу localhost:80 доступна стартовая страница nginx.
-
-- ![Проверка nginx странички](./images/Part1/8.png)
-
-#### Перезапусти докер контейнер через docker restart [container_id|container_name].
-
-#### Проверь любым способом, что контейнер запустился.
-
-- ![Рестарт с проверкой контейнера](./images/Part1/9.png)
-
-
-## Part 2. Операции с контейнером
-
-#### Прочитай конфигурационный файл nginx.conf внутри докер контейнера через команду exec.
-
-- ![Чтение nginx.conf внутри контейнера через docker exec](./images/Part2/1.png)
-
-#### Создай на локальной машине файл nginx.conf.
-
-#### Настрой в нем по пути /status отдачу страницы статуса сервера nginx.
-
-- ![Создание nginx.conf на локальной машине](./images/Part2/2.png)
-
-#### Скопируй созданный файл nginx.conf внутрь докер-образа через команду docker cp.
-
-- ![Копируем созданный конфиг в контейнер](./images/Part2/3.png)
-
-#### Перезапусти nginx внутри докер-образа через команду exec.
-
-- ![Перезапускаем nginx](./images/Part2/4.png)
-
-#### Проверь, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
-
-- ![Проверяем наличие странички](./images/Part2/5.png)
-
-#### Экспортируй контейнер в файл container.tar через команду export.
-
-- ![Экспортируем контейнер](./images/Part2/6.png)
-
-#### Останови контейнер.
-
-#### Удали образ через docker rmi [image_id|repository], не удаляя перед этим контейнеры.
-
-#### Удали остановленный контейнер.
-
-- ![Останавливаем, удаляем образ с контейнером](./images/Part2/7.png)
-
-#### Импортируй контейнер обратно через команду import.
-
-#### Запусти импортированный контейнер.
-
-- ![Импортируем и запускаем контейнер из .tor файла](./images/Part2/8.png)
-
-#### Проверь, что по адресу localhost:80/status отдается страничка со статусом сервера nginx.
-
-- ![Проверяем наличие /status](./images/Part2/9.png)
-
-
-## Part 3. Мини веб-сервер
-
-##### Напиши мини-сервер на **C** и **FastCgi**, который будет возвращать простейшую страничку с надписью `Hello, World!`.
-##### Запусти написанный мини-сервер через *spawn-fcgi* на порту 8080.
-
-- ![Запуск сервера на С](./images/Part3/start_server.png)
-
-##### Напиши свой *nginx.conf*, который будет проксировать все запросы с 81 порта на *127.0.0.1:8080*.
-##### Запусти локально **nginx** с написанной конфигурацией.
-
-- ![Запуск nginx сервера](./images/Part3/start_nginx.png)
-
-##### Проверь, что в браузере по *localhost:81* отдается написанная тобой страничка.
-
-- ![Проверяем](./images/Part3/checking_server.png)
-
-##### Положи файл *nginx.conf* по пути *./nginx/nginx.conf* (это понадобится позже).
-
-## Part 4. Свой докер
-
-*При написании докер-образа избегай множественных вызовов команд RUN*
-
-#### Напиши свой докер-образ, который:
-##### 1) собирает исходники мини сервера на FastCgi из [Части 3](#part-3-мини-веб-сервер);
-##### 2) запускает его на 8080 порту;
-##### 3) копирует внутрь образа написанный *./nginx/nginx.conf*;
-##### 4) запускает **nginx**.
-_**nginx** можно установить внутрь докера самостоятельно, а можно воспользоваться готовым образом с **nginx**'ом, как базовым._
-
-##### Собери написанный докер-образ через `docker build` при этом указав имя и тег.
-
-- ![Запуск docker build](./images/Part4/build.png)
-
-##### Проверь через `docker images`, что все собралось корректно.
-
-- ![Запуск docker build](./images/Part4/images.png)
-
-##### Запусти собранный докер-образ с маппингом 81 порта на 80 на локальной машине и маппингом папки *./nginx* внутрь контейнера по адресу, где лежат конфигурационные файлы **nginx**'а (см. [Часть 2](#part-2-операции-с-контейнером)).
-
-- ![Запуск docker run](./images/Part4/runContainer.png)
-
-##### Проверь, что по localhost:80 доступна страничка написанного мини сервера.
-
-- ![Смотрим страничку](./images/Part4/check.png)
-
-##### Допиши в *./nginx/nginx.conf* проксирование странички */status*, по которой надо отдавать статус сервера **nginx**.
-##### Пересобери докер-образ.
-*Если всё сделано верно, то, после сохранения файла и перезапуска контейнера, конфигурационный файл внутри докер-образа должен обновиться самостоятельно без лишних действий*.
-##### Проверь, что теперь по *localhost:80/status* отдается страничка со статусом **nginx**
-
-- ![Проверяем](./images/Part4/status.png)
-
-## Part 5. **Dockle**
-
-##### Просканируй образ из предыдущего задания через `dockle [image_id|repository]`.
-
-- ![Проверяем](./images/Part5/dockle.png)
-
-##### Исправь образ так, чтобы при проверке через **dockle** не было ошибок и предупреждений.
-
-- ![Исправили](./images/Part5/newImage.png)
-
-## Part 6. Базовый **Docker Compose**
-
-##### Напиши файл *docker-compose.yml*, с помощью которого:
-##### 1) Подними докер-контейнер из [Части 5](#part-5-инструмент-dockle) _(он должен работать в локальной сети, т. е. не нужно использовать инструкцию **EXPOSE** и мапить порты на локальную машину)_.
-##### 2) Подними докер-контейнер с **nginx**, который будет проксировать все запросы с 8080 порта на 81 порт первого контейнера.
-##### Замапь 8080 порт второго контейнера на 80 порт локальной машины.
-
-##### Останови все запущенные контейнеры.
-
-- ![Останавливаем](./images/Part6/containers.png)
-
-##### Собери и запусти проект с помощью команд `docker-compose build` и `docker-compose up`.
-
-- ![Билдим](./images/Part6/build.png)
-
-- ![Поднимаем](./images/Part6/up.png)
-
-##### Проверь, что в браузере по *localhost:80* отдается написанная тобой страничка, как и ранее.
-
-- ![Смотрим](./images/Part6/result.png)
+## Part 1. Получение метрик и логов
+
+1. Использовать Docker Swarm из первого проекта. 
+
+2. Написать при помощи библиотеки Micrometer сборщики следующих метрик приложения: 
+   - количество отправленных сообщений в rabbitmq;
+   - количество обработанных сообщений в rabbitmq;
+   - количество бронирований;
+   - количество полученных запросов на gateway;
+   - количество полученных запросов на авторизацию пользователей.
+
+- Для получения количества бронирований, запросов на gateway и авторизацию пользователей добавил зависимости в pom.xml соотвествующих сервисов:
+
+    <details>
+    <summary>Добавленные зависимости</summary>
+
+    ```java
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+    ```
+
+    </details>
+
+
+- Для rabbitmq использовал новый docker-образ с вшитым сбором метрик
+    rabbitmq:3-management-alpine
+
+3. Добавить логи приложения с помощью Loki.
+
+    <details>
+    <summary>Проверяем сервисы которые отдают логи в Loki</summary>
+
+    ```sh
+    vagrant@worker02:~$ curl -s 'http://localhost:3100/loki/api/v1/label/swarm_service/values' | jq '.'
+    {
+    "status": "success",
+    "data": [
+        "monitoring_blackbox_exporter",
+        "monitoring_cadvisor",
+        "monitoring_grafana",
+        "monitoring_loki",
+        "monitoring_node_exporter",
+        "monitoring_prometheus",
+        "monitoring_promtail",
+        "mystack_booking",
+        "mystack_database",
+        "mystack_gateway",
+        "mystack_hotel",
+        "mystack_loyalty",
+        "mystack_nginx",
+        "mystack_payment",
+        "mystack_rabbit",
+        "mystack_report",
+        "mystack_session"
+    ]
+    }
+    ```
+
+    </details>
+
+
+4. Создать новый стек для Docker Swarm из сервисов с Prometheus Server, Loki, node_exporter, blackbox_exporter, cAdvisor. Проверить получение метрик на порту 9090 через браузер.
+
+- Новый стек:
+
+    <details>
+    <summary>docker-compose.monitoring.yml</summary>
+
+    ```yml
+    version: '3.8'
+
+    services:
+    prometheus:
+        image: prom/prometheus:latest
+        hostname: prometheus
+        restart: unless-stopped
+        expose:
+        - "9090"
+        ports:
+        - "9090:9090"
+        volumes:
+        - /home/vagrant/metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        - /var/run/docker.sock:/var/run/docker.sock:ro  
+        - /home/vagrant/metrics/alert/rules.yml:/etc/prometheus/rules.yml
+        networks:
+        - monitoring
+        - shared
+
+    promtail:
+        image: grafana/promtail:latest
+        hostname: promtail
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/lib/docker/containers:/var/lib/docker/containers:ro
+        configs:
+        - source: promtail_config
+            target: /etc/promtail/config.yml
+        command: -config.file=/etc/promtail/config.yml
+        networks:
+        - monitoring
+        - shared
+        deploy:
+        mode: global
+        placement:
+            constraints:
+            - node.platform.os == linux
+
+    alertmanager:
+        image: prom/alertmanager:latest
+        hostname: alertmanager
+        ports:
+        - "9093:9093"
+        configs:
+        - source: alertmanager_config
+            target: /etc/alertmanager/alertmanager.yml
+        networks:
+        - monitoring
+        - shared
+
+    telegram_webhook:
+        image: ghcr.io/d13410n3/am-telegram:latest
+        environment:
+        - TELEGRAM_BOT_TOKEN=token
+        - TELEGRAM_CHAT_ID=chat
+        - GRAFANA_BASE_URL=http://grafana:3000
+        - PROM_BASE_URL=http://prometheus:9090
+        - AM_BASE_URL=http://alertmanager:9093
+        ports:
+        - "8080:8080"
+        networks:
+        - monitoring
+        - shared
+
+    loki:
+        hostname: loki
+        image: grafana/loki:latest
+        expose:
+        - "3100"
+        ports:
+        - "3100:3100"
+        networks:
+        - monitoring
+        - shared
+    
+    grafana:
+        image: grafana/grafana:latest
+        hostname: grafana
+        expose:
+        - "3000"
+        volumes:
+        - grafana-storage:/var/lib/grafana
+        - /home/vagrant/metrics/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+        - /home/vagrant/metrics/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+        ports:
+        - "3000:3000"
+        environment:
+        - GF_SECURITY_ADMIN_PASSWORD=admin
+        networks:
+        - monitoring
+    
+    node_exporter:
+        image: prom/node-exporter:latest
+        hostname: nodeexporter
+        restart: unless-stopped
+        expose:
+        - "9100"
+        networks:
+        - monitoring
+
+    blackbox_exporter:
+        image: prom/blackbox-exporter:latest
+        
+        hostname: blackboxexporter
+        restart: unless-stopped
+        expose:
+        - "9115"
+        networks:
+        - monitoring
+
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:latest
+        hostname: cadvisor
+        restart: unless-stopped
+        expose:
+        - "8080"
+        networks:
+        - monitoring
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:ro
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+            - /dev/disk/:/dev/disk:ro 
+        deploy:
+        mode: global
+        placement:
+            constraints:
+            - node.platform.os == linux
+
+    volumes:
+    grafana-storage:
+        external: true
+    configs:
+    loki_config:
+        file: /home/vagrant/metrics/loki/loki-config.yml
+    promtail_config:
+        file: /home/vagrant/metrics/promtail/promtail-config.yml
+    alertmanager_config:
+        file: /home/vagrant/metrics/alert/alertmanager.yml
+    networks:
+    monitoring:
+        driver: overlay
+    shared:
+        external: true
+    ```
+
+    </details>
+
+- ![Проверяем цели прометеуса](./images/prometheus.png)
+
+## Part 2. Визуализация
+
+1. Развернуть grafana как новый сервис в стеке мониторинга.
+
+2. Добавить в Grafana дашборд со следующими метриками:
+   - количество нод;
+   - количество контейнеров;
+   - количество стеков;
+   - использование CPU по сервисам;
+   - использование CPU по ядрам и узлам;
+   - затраченная RAM;
+   - доступная и занятая память;
+   - количество CPU;
+   - доступность google.com;
+   - количество отправленных сообщений в rabbitmq;
+   - количество обработанных сообщений в rabbitmq;
+   - количество бронирований;
+   - количество полученных запросов на gateway;
+   - количество полученных запросов на авторизацию пользователей;
+   - логи приложения.
+
+- ![](./images/grafana1.png)
+- ![](./images/grafana2.png)
+
+## Part 3. Отслеживание критических событий
+
+1. Развернуть Alert Manager как новый сервис в стеке монтиторинга.
+
+- Добавил alertmanager и telegram_webhook для отправки сообщений в телеграм в стек мониторинга
+    <details>
+    <summary>compose файл</summary>
+
+    ```yml
+    alertmanager:
+        image: prom/alertmanager:latest
+        hostname: alertmanager
+        ports:
+        - "9093:9093"
+        configs:
+        - source: alertmanager_config
+        target: /etc/alertmanager/alertmanager.yml
+        networks:
+        - monitoring
+        - shared
+    telegram_webhook:
+        image: ghcr.io/d13410n3/am-telegram:latest
+        environment:
+        - TELEGRAM_BOT_TOKEN=token
+        - TELEGRAM_CHAT_ID=chat
+        - GRAFANA_BASE_URL=http://grafana:3000
+        - PROM_BASE_URL=http://prometheus:9090
+        - AM_BASE_URL=http://alertmanager:9093
+        ports:
+        - "8080:8080"
+        networks:
+        - monitoring
+        - shared
+    ```
+
+    </details>
+
+
+2. Добавить следующие критические события:
+   - доступная память меньше 100 Мб;
+   - затраченная RAM больше 1 Гб;
+   - использование CPU по сервису превышает 10%.
+
+
+- ![Алерты](./images/alerts.png)
+   
+    <details>
+    <summary>Файл с правилами</summary>
+
+    ```yml
+    groups:
+  - name: critical_alerts
+    rules:
+      - alert: LowMemory
+        expr: node_memory_MemAvailable_bytes < 100 * 1024 * 1024
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Низкий объем свободной памяти на {{ $labels.instance }}"
+          description: "Доступная память на узле {{ $labels.instance }} упала ниже 100MB. Текущее значение: {{ $value | humanize }}MB."
+
+      - alert: HighMemoryUsage
+        expr: sum(container_memory_working_set_bytes{container_label_com_docker_swarm_service_name=~"mystack_.+"}) by (container_label_com_docker_swarm_service_name) > 1e+09
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Высокое потребление RAM сервисом {{ $labels.container_label_com_docker_swarm_service_name }}"
+          description: "Сервис {{ $labels.container_label_com_docker_swarm_service_name }} использует более 1GB RAM. Текущее использование: {{ $value | humanize }}MB."
+
+      - alert: HighContainerCPUUsage
+        expr: sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_swarm_service_name=~"mystack_.+"}[2m])) by (container_label_com_docker_swarm_service_name) * 100 > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая нагрузка CPU на сервис {{ $labels.container_label_com_docker_swarm_service_name }}"
+          description: "Использование CPU сервисом {{ $labels.container_label_com_docker_swarm_service_name }} превысило 10%."
+    ```
+
+    </details>
+
+3. Настроить получение оповещений через личные email и Телеграм.
+
+- ![Уведомление с почты](./images/alertEmail.png)

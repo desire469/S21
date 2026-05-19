@@ -1,23 +1,16 @@
-# Simple Docker
+# Monitoring
 
-Introduction to docker. Developing a simple docker image for your own server.
+Monitoring tools to track metrics and critical situations.
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
 ## Contents
 
-1. [Chapter I](#chapter-i)
+1. [Chapter I](#chapter-i) 
 2. [Chapter II](#chapter-ii) \
-    2.1. [nginx](#nginx) \
-    2.2. [Docker](#docker) \
-    2.3. [Dockle](#dockle)
-3. [Chapter III](#chapter-iii) \
-    3.1. [Ready-made docker](#part-1-ready-made-docker) \
-    3.2. [Operations with container](#part-2-operations-with-container) \
-    3.3. [Mini web server](#part-3-mini-web-server) \
-    3.4. [Your own docker](#part-4-your-own-docker) \
-    3.5. [Dockle](#part-5-dockle) \
-    3.6. [Basic Docker Compose](#part-6-basic-docker-compose)
+   2.1. [Getting metrics and logs](#part-1-getting-metrics-and-logs) \
+   2.2. [Visualization](#part-2-visualization) \
+   2.3. [Critical event monitoring](#part-3-critical-event-monitoring) 
 
 ## Instructions
 
@@ -39,204 +32,71 @@ How to work with the project:
 
 ## Chapter I
 
-![simple_docker](misc/images/simple_docker.png)
+Application monitoring is an important part of any software development. Monitoring usually involves collecting and visualizing metrics and logs of both the application and the infrastructure in which the application is deployed. 
 
-Planet Earth, somewhere in the middle of the sea, today.
+**Metrics** are numeric values that show the actual parameters and performance of the application. **Logs** are text records with important information about the progress of the application.
 
-You never liked to move. Lots of fuss, little action. But you managed to find a great job in another city to immerse yourself in the DevOps world.
-And you're not one to let a little trouble ruin your plans.
-
-From your cabin window, you hear the sound of the waves, the ship peacefully rocking on them, and you remember your favourite novel about the sea — "Moby Dick".
-Although the plot is far from straightforward, with many lyrical digressions and philosophical musings, you, like everyone else, associate this book primarily with Moby Dick himself — the white whale.
-
-"Hmm... White whale..." This is where you remember that during the long voyage you wanted to work on the dock.
-
+The combination of Prometheus and Grafana is in fact one of the most frequently used solutions for collecting and visualizing metrics in applications and distributed systems. Loki is a tool inspired by Prometheus for collecting textual logs.
 
 ## Chapter II
 
-### **nginx**
+The result of the work must be a report with detailed descriptions of the implementation of each of the points with screenshots. The report is prepared as a markdown file in the `src` directory named `REPORT.MD`.
 
-**nginx** (pronounced "engine-x") is an open-source reverse proxy server for HTTP, HTTPS, etc. **nginx** is also used as a load balancer, web server and for HTTP caching. The **nginx** project focuses on high parallelism, high performance and low memory usage.
+## Part 1. Getting metrics and logs
 
+In this chapter you will configure Prometheus and Loki to collect metrics and logs for the application.
 
-**nginx** has one main process and several worker processes.
-The primary task of the main process is to read and check the configuration and manage the worker processes.
-The worker processes perform the actual processing of the requests.
+### Task 
 
-How **nginx** and its modules work is defined in the configuration file. By default, the configuration file is called *nginx.conf*
+1. Use the Docker Swarm from the first project. 
 
-### **Docker**
+2. Use the Micrometer library to write the following application metrics collectors: 
+   - number of messages sent to rabbitmq;
+   - number of messages processed in rabbitmq;
+   - number of bookings;
+   - number of requests received at the gateway;
+   - number of user authorization requests received.
 
-A container is a new "executable file" that includes all the dependencies the product needs.
+3. Add application logs using Loki.
 
-The main advantage of containerisation is the isolation of dependencies and a single, simple software start-up point.
+4. Create a new stack for the Docker Swarm of services with Prometheus Server, Loki, node_exporter, blackbox_exporter, cAdvisor. Check receiving metrics on port 9090 via a browser.
 
-Basic terms:
-- Docker image — the "package" for the application and dependencies (including system ones).
-- Container — an instance of an image, i.e. a 'alive' image.
+## Part 2. Visualization
 
-**Docker** is a platform that is designed to develop, deploy and run applications in containers.
-**Docker** is the 'de-facto' standard containerisation tool in the industry, but it is not the first or last among containerisation technologies.
+In this chapter you will configure Grafana to visualize metrics and logs.
 
-The forerunners of **Docker** containers were virtual machines.
-A virtual machine, like a container, isolates the application and its dependencies from the outside environment.
-However, **Docker** containers have advantages over virtual machines.
-For example, they are very easy to port, consume fewer resources, start and run faster.
+### Task
 
-A docker image consists of layers. Each layer describes some change to be performed to the data on the running container.
-The structure of links between layers is hierarchical. There is a base layer on which the other layers are "overlaid".
-The *Dockerfile* is used to create an image. Each instruction in it creates a new layer.
+1. Deploy Grafana as a new service in the monitoring stack.
 
-### **Dockle**
+2. Add a dashboard with the following metrics to Grafana:
+   - number of nodes;
+   - number of containers;
+   - number of stacks;
+   - CPU usage for services;
+   - CPU usage for cores and nodes;
+   - spent RAM;
+   - available and used memory;
+   - number of CPUs;
+   - google.com availability;
+   - number of messages sent to rabbitmq;
+   - number of messages processed in rabbitmq;
+   - number of bookings;
+   - number of requests received at the gateway;
+   - number of user authorization requests received;
+   - application logs.
 
-**Dockle** is a container image security checking tool that can be used to find vulnerabilities.
+## Part 3. Critical event monitoring
 
-Key features and benefits of **Dockle**:
-- searches for vulnerabilities in images;
-- helps in creating a proper Dockerfile;
-- easy to use, you only need to specify the image name;
-- support for *CIS Benchmarks*.
+In this chapter you will configure the Alert Manager to alert you about critical events.
 
-### **Docker Compose**
+### Task 
 
-Docker Compose is a tool for handling tasks related to projects deployment.
-Docker Compose can be helpful if several services are used to keep the project running.
+1. Deploy Alert Manager as a new service in the monitored stack.
 
-Docker Compose is used to simultaneously manage multiple containers that are part of an application.
-This tool offers the same features as Docker, but allows to work with more complex distributed applications, e.g. microservices.
+2. Add the following critical events:
+   - available memory is less than 100 MB;
+   - used RAM is more than 1 GB;
+   - CPU usage for the service exceeds 10%.
 
-
-## Chapter III
-
-As a result of the work you should provide a report on the first two tasks. Each part of the task describe what should be added to the report once it has been completed. This can be answers to questions, screenshots, etc.
-
-As a result of the third task you should provide source files for running the web server.
-
-As a result of the fourth and fifth tasks you should provide dockerfiles.
-
-As a result of the sixth task you should provide a *docker-compose.yml* file and the dockerfiles needed to run it (if not provided earlier).
-
-- A report with a .md extension must be uploaded to the repository, in the src folder;
-- All parts of the task should be highlighted in the report as level 2 headings;
-- Within one part of the task, everything that is added to the report must be in the form of the list;
-- Each screenshot in the report must be briefly captioned (what’s in the screenshot);
-- All screenshots must be cropped so that only the relevant part of the screen is shown;
-- It’s allowed to have several task points shown in one screenshot, but they must all be described in the caption;
-- Source files for running the web server from the third task should be uploaded to the repository, in the src/server folder;
-- Dockerfiles from the fourth and fifth tasks should be uploaded to the repository, in the src folder;
-- *docker-compose.yml* from the sixth task should be uploaded to the repository, in the src folder;
-- Be prepared to demonstrate your work if necessary.
-
-## Part 1. Ready-made docker
-
-As the final goal of your little practice you have immediately chosen to write a docker image for your own web server, so first you need to deal with a ready-made docker image for the server.
-You chose a pretty simple **nginx**.
-
-**== Task ==**
-
-##### Take the official docker image from **nginx** and download it using `docker pull`.
-##### Check for the docker image with `docker images`.
-##### Run docker image with `docker run -d [image_id|repository]`.
-##### Check that the image is running with `docker ps`.
-##### View container information with `docker inspect [container_id|container_name]`.
-##### From the command output define and write in the report the container size, list of mapped ports and container ip.
-##### Stop docker container with `docker stop [container_id|container_name]`.
-##### Check that the container has stopped with `docker ps`.
-##### Run docker with ports 80 and 443 in container, mapped to the same ports on the local machine, with *run* command.
-##### Check that the **nginx** start page is available in the browser at *localhost:80*.
-##### Restart docker container with `docker restart [container_id|container_name]`.
-##### Check in any way that the container is running.
-
-- Add the following screenshots to the report:
-    - the call and output of all commands used in this part of the task;
-    - **nginx** start page at *localhost:80* (address must be shown).
-    
-*Note:* **Don't upload heavy files (>10 mb) to git.**
-
-## Part 2. Operations with container
-
-Docker image and container are ready. Now we can look into **nginx** configuration and display page status.
-
-**== Task ==**
-
-##### Read the *nginx.conf* configuration file inside the docker container with the *exec* command.
-##### Create a *nginx.conf* file on a local machine.
-##### Configure it on the */status* path to return the **nginx** server status page.
-##### Copy the created *nginx.conf* file inside the docker image using the `docker cp` command.
-##### Restart **nginx** inside the docker image with *exec*.
-##### Check that *localhost:80/status* returns the **nginx** server status page.
-##### Export the container to a *container.tar* file with the *export* command.
-##### Stop the container.
-##### Delete the image with `docker rmi [image_id|repository]` without removing the container first.
-##### Delete stopped container.
-##### Import the container back using the *import* command.
-##### Run the imported container.
-##### Check that *localhost:80/status* returns the **nginx** server status page.
-
-- Add the following screenshots to the report:
-    - the call and output of all commands used in this part of the task;
-    - the contents of the created *nginx.conf* file;
-    - the **nginx** server status page at *localhost:80/status*.
-
-
-## Part 3. Mini web server
-
-It's time to take a little break from the docker to prepare for the last stage. It's time to write your own server.
-
-**== Task ==**
-
-##### Write a mini server in **C** and **FastCgi** that will return a simple page saying `Hello, World!`.
-##### Run the written mini server via *spawn-fcgi* on port 8080.
-##### Write your own *nginx.conf* that will proxy all requests from port 81 to *127.0.0.1:8080*.
-##### Run **nginx** locally with the written configuration.
-##### Check that browser on *localhost:81* returns the page you wrote.
-##### Put the *nginx.conf* file under *./nginx/nginx.conf* (you will need this later).
-
-## Part 4. Your own docker
-
-Now everything is ready. You can start writing the docker image for the created server.
-
-**== Task ==**
-
-*When writing a docker image avoid multiple calls of RUN instructions*
-
-#### Write your own docker image that:
-##### 1) builds mini server sources on FastCgi from [Part 3](#part-3-mini- web-server);
-##### 2) runs it on port 8080;
-##### 3) copies inside the image written *./nginx/nginx.conf*;
-##### 4) runs **nginx**.
-_**nginx** can be installed inside the docker itself, or you can use a ready-made image with **nginx** as base._
-##### Build the written docker image with `docker build`, specifying the name and tag.
-##### Check with `docker images` that everything is built correctly.
-##### Run the built docker image by mapping port 81 to 80 on the local machine and mapping the *./nginx* folder inside the container to the address where the **nginx** configuration files are located (see [Part 2](#part-2-operations-with-container)).
-##### Check that the page of the written mini server is available on localhost:80.
-##### Add proxying of */status* page in *./nginx/nginx.conf* to return the **nginx** server status.
-##### Rebuild docker image.
-*If everything is done correctly, after saving the file and restarting the container, the configuration file inside the docker image should update itself without any extra steps
-##### Check that *localhost:80/status* now returns a page with **nginx** status.
-
-## Part 5. **Dockle**
-
-Once you've written the image, it's never a bad idea to check it for security.
-
-**== Task ==**
-
-##### Check the image from the previous task with `dockle [image_id|repository]`.
-##### Fix the image so that there are no errors or warnings when checking with **dockle**.
-
-
-## Part 6. Basic **Docker Compose**
-
-There, you've finished your warm-up. Wait a minute though...
-Why not try experimenting with deploying a project consisting of several docker images at once?
-
-**== Task ==**
-
-##### Write a *docker-compose.yml* file, using which:
-##### 1) Start the docker container from [Part 5](#part-5-dockle) _(it must work on local network, i.e., you don't need to use **EXPOSE** instruction and map ports to local machine)_.
-##### 2) Start the docker container with **nginx** which will proxy all requests from port 8080 to port 81 of the first container.
-##### Map port 8080 of the second container to port 80 of the local machine.
-##### Stop all running containers.
-##### Build and run the project with the `docker-compose build` and `docker-compose up` commands.
-##### Check that the browser returns the page you wrote on *localhost:80* as before.
-
+3. Configure notifications via personal email and Telegram.
