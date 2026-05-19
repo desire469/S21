@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: my-app-ingress
+    namespace: service
+    annotations:
+        kubernetes.io/ingress.class: nginx
+spec:
+    tls:
+      - hosts:
+          - app.do11.com
+        secretName: my-wildcard-tls
+    rules:
+      - host: app.do11.com
+        http:
+            paths:
+              - path: /api/v1/gateway
+                pathType: Prefix
+                backend:
+                    service:
+                        name: gateway-service
+                        port:
+                            number: 8087
+              - path: /api/v1/auth/authorize
+                pathType: Prefix
+                backend:
+                    service:
+                        name: session-service
+                        port:
+                            number: 8081

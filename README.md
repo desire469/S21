@@ -1,4 +1,4 @@
-# Advanced Kubernetes
+# Helm и Kustomization
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -6,7 +6,8 @@
 
 1. [Chapter I](#chapter-i) 
 2. [Chapter II](#chapter-ii) \
-   2.1. [Deploying your own k3s cluster](#part-1-deploying-your-own-k3s-cluster) \
+   2.1. [Deploying an application using Kustomize](#part-1-deploying-an-application-using-Kustomize) \
+   2.2. [Deploying an application using Helm](#part-2-deploying-an-application-using-Helm) \
 
 ## Instructions
 
@@ -28,32 +29,74 @@ How to work with the project:
 
 ## Chapter I
 
-Besides Docker Swarm, there are many other orchestration tools. One of the most popular is Kubernetes, a tool developed by Google. Kubernetes' main difference is its higher complexity and scale. Kubernetes is intended for more serious applications with a large number of services and complex interactions. It also has a number of additional built-in tools, such as an internal monitoring system.
+Kubernetes is one of the fastest-growing technologies, and companies of all kinds are now using it. When running an application in Kubernetes, you need to deploy several objects, such as a deployment, a configuration map, and secrets. All of these objects must be defined in the manifest.yml file and sent to the Kubernetes API server. Kubernetes then reads these manifests and creates the necessary objects.
+
+While deploying an application once is fine, if you want to deploy the application repeatedly, you must send all the manifest files to the Kubernetes API server each time. Helm is a tool that solves this problem.
+
+**Helm** is a package manager for Kubernetes that provides solutions for package management, security, and configuration when deploying applications to Kubernetes. Helm simplifies your work with Kubernetes.
+
+Meanwhile, **Kustomize** is becoming an increasingly popular tool for managing Kubernetes manifests. Unlike Helm, which uses templates, Kustomize relies on existing manifests. It provides various features, including resource namespace, metadata modification, and Kubernetes secret creation, without editing the source manifests.
 
 ## Chapter II
 
-The result of the work must be a report with detailed descriptions and screenshots of the implementation of each point. Prepare the report as a Markdown file in the `src` directory named `REPORT.MD`.
+The result of the work must be a report with detailed descriptions of how each point was implemented, accompanied by screenshots. Prepare the report as a Markdown file in the `src` directory named `REPORT.MD`.
 
-## Part 1. Deploying your own k3s cluster
+## Part 1. Deploying an application using Kustomize
+
+### Task
+
+1. Get a set of virtual machines with a deployed cluster.
+
+2. Copy the manifests from previous blocks.
+
+3. Install *kustomize* on the local machine.
+
+4. Create a deployment project skeleton with one base configuration and one overlay configuration (production):
+
+```
+├── base
+│   ├── deployment.yaml
+│   ├── kustomization.yaml
+│   ├── service.yaml
+│   └── ...
+├── overlays
+│   └── production
+│       ├── kustomization.yaml
+│       ├── configMap.yaml
+│       ├── secret.yaml
+│       └── ...
+├── kustomization.yaml
+└── ...
+```
+
+5. Write base and overlay configurations for Kustomize. Specify the services and deployments in the base configuration and add the specific secrets and configuration values in the production configuration.
+
+6. Create `replicas-patch.yaml` for the production overlay that modifies the number of replicas for the gateway service deployment to three.
+
+7. Build the resulting configuration file, taking the `production` overlay into account.
+
+8. Run Postman functional tests to ensure that the application works.
+
+## Part 2. Deploying an application using Helm
 
 ### Task 
 
-1. Obtain a set of virtual machines for the cluster.
+1. Get a set of virtual machines with a deployed cluster.
 
-2. Install k3s on all three machines. During installation, do not use the standard Ingress Controller by adding the flag `--disable=traefik`.
+2. Copy the manifests from previous blocks.
 
-3. Connect the nodes to the cluster using the `k3s server` command and the `-token` and `--server` flags for the worker and master nodes, respectively. Once k3s is installed, the environment variable `NODE_TOKEN` can be used.
+3. Install *Helm* on the local machine and ensure that the tool has a valid connection to the resulting remote Kubernetes cluster.
 
-4. Install the Ingress Controller Nginx instead of the default one. You can use the official nginx-based ingress controller manifest file available on GitHub.
+4. Create Helm charts and templates for your application with the `helm create` command. This command creates a basic chart structure with templates for deployment, service, and ingress resources.
 
-5. Get a domain name and configure the `cert-manager` utility inside the cluster. This should generate a wildcard certificate for the domain.
+5. Edit the `values.yaml` in the chart to specify the configuration parameters needed to create Kubernetes manifests for the specified deployments. Describe the deployment objects and services in the templates directory.
 
-6. Create an Ingress resource for your personal domain, and configure it to use the Nginx Ingress Controller and the obtained certificate.
+6. Use the `helm package` command to pack the *Helm chart* and create a `*.tgz` file containing the chart and its dependencies.
 
-7. Create a Persistent Volume (PV) for the PostgreSQL database in the manifest from the tenth project.
+7. Deploy the Helm chart in the Kubernetes cluster using the `helm install` command. Specify an arbitrary `namespace` and `release-name`.
 
-8. Run the application described in the manifest.
+8. Check the status of the deployed application with the `kubectl get` command. Add the results to the report.
 
-9. Run Postman functional tests to ensure that the application is working properly.
+9. Make at least one change to `values.yaml` and run the `helm upgrade` command.
 
-10. Install and run the Prometheus Operator to collect metrics in the system. Include the result of the `kubectl get pods -n monitoring` command in the report.
+10. Run Postman functional tests to ensure that the application is working properly.

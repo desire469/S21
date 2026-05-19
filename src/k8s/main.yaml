@@ -1,0 +1,955 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    environment: production
+  name: production
+---
+apiVersion: v1
+data:
+  BOOKING_SERVICE_HOST: prod-app-booking-service
+  BOOKING_SERVICE_PORT: "8083"
+  GATEWAY_SERVICE_HOST: prod-app-gateway-service
+  GATEWAY_SERVICE_PORT: "8087"
+  HOTEL_SERVICE_HOST: prod-app-hotel-service
+  HOTEL_SERVICE_PORT: "8082"
+  LOYALTY_SERVICE_HOST: prod-app-loyalty-service
+  LOYALTY_SERVICE_PORT: "8085"
+  PAYMENT_SERVICE_HOST: prod-app-payment-service
+  PAYMENT_SERVICE_PORT: "8084"
+  POSTGRES_HOST: prod-app-postgres-service
+  POSTGRES_PORT: "5432"
+  RABBIT_MQ_EXCHANGE: messagequeue-exchange
+  RABBIT_MQ_HOST: prod-app-rabbit-service
+  RABBIT_MQ_PORT: "5672"
+  RABBIT_MQ_QUEUE_NAME: messagequeue
+  REPORT_SERVICE_HOST: prod-app-report-service
+  REPORT_SERVICE_PORT: "8086"
+  SESSION_SERVICE_HOST: prod-app-session-service
+  SESSION_SERVICE_PORT: "8081"
+kind: ConfigMap
+metadata:
+  labels:
+    environment: production
+  name: prod-app-config-5kkf4f6m65
+  namespace: production
+---
+apiVersion: v1
+data:
+  init.sql: |-
+    \c postgres;
+    DROP DATABASE IF EXISTS users_db;
+    CREATE DATABASE users_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS hotels_db;
+    CREATE DATABASE hotels_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS reservations_db;
+    CREATE DATABASE reservations_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS payments_db;
+    CREATE DATABASE payments_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS balances_db;
+    CREATE DATABASE balances_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS statistics_db;
+    CREATE DATABASE statistics_db OWNER postgres;
+kind: ConfigMap
+metadata:
+  labels:
+    environment: production
+  name: prod-postgres-init-script-466m8th9cb
+  namespace: production
+---
+apiVersion: v1
+data:
+  AUTH_TOKEN: |
+    TUlJRXZRSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2N3Z2dTakFnRUFBb0lCQVFDOV
+    ExaGw2b3NzQ2c1VHI0M0lXMHB4Mld6MHRET0tSSG5jcmVaY2V3M0crNjNRdVhyTFNiNUJS
+    aDI0cTBlajRXK1dqOC82UlI2dndHMWhGdFBJQnF5Nk9ZVXZFZEJtT2F5OWVFcHpRYzJYeT
+    I1M3FTUXl4Y280Rm15TkxBd2Z5azBKUzVES2RhZ1Q2Y3QzQXFRZTkrb0dzRUhmMThDV0Qv
+    ZG5ZcmZLSTY0NHVxbmlJM0x6cmsrWW5Jd1o4QkNoS01ONDBxZDdYa1J1V3NKQkdFSnIraH
+    AxRjFLdmFZYlB6L2dxdkJKUytJbEczNy82bU8xeG9NYURmUHhFVUNKYkhpV1M4UGNTZUM5
+    VGxsVlZ0QytveVBuUXpZRWJCaDdaZnhid0FEM3k1RlczcXhXTjMzc1E1M1hhSDd6SG9uZE
+    1BUUo2aFFST0NiNk1sLzBiQktmVTBoejlBZ01CQUFFQ2dnRUFOSTU2QXJzeDhJWE9XckRh
+    WjNQcVpWa2laNFdPOW10emg3T0d6OUdnRHN5ZkJPSXMxanpoSjFFb09icmVod1M0THhBNm
+    lkNGQybUpPUFhMUVZyQjcwSzdlYkNhL1AxUHV3eUtmVWdoSTVra29vUFFJU0UwaWpaYTBp
+    RE5lSG9uWUFLZktTbDZIMFJmUVYza1ZTRUJCN1orT2UzRjNXblNPbUZnU2Y0Q1BCZE5jMj
+    Qwa2FuUWx4c21LanNEbXN4TGVQaVlOeFU2dkRvWnQvSktRbVN3UVVJZ3puTW03dXBFbWgz
+    VVI4cTdONzU3SStkVEVoR3hzOExMR3l2SjJuR25vbEg5ZnBrWEpsQUtIQVV2blgxTmZVa0
+    NnSUdpVnFwc3h3SGI1alRtanFwSDFVOHVzYVNQWkREMHVMZjRETFVqSWdkZHBTR2NVSWpL
+    bGFOTzlzUVhzQlFLQmdRRDVYcE5NcWdJWmd0ZkVPVko0NGF1TVpxQ3NJdUtYd3NJQ05abW
+    VxU2t2NUoyOW92M1YvZmtCakRwd2l5RVhPLzlIZUZPVUVHU05HZUZQRjRoYTBLbk5GbWVU
+    d0RDSVBBMnZ5RjNaMDQ5R2ZSeXRjNHFEcXdkcGxWamdQQlBLZnJHTm1HZEhsS0tvRUhHan
+    BXbnVKZ09rTmhlblBLRzd6YmV2cHR5N1RxZ2x1d0tCZ1FEQ1M2SkVsOWozNGdwNStNb3hJ
+    YmtYdDFXT3duZ25Gd1JzY2tsVEVHSjR3WjNpNkd0S0lPVnpZZDdWRHFnb21CL2pua0RRbE
+    JLNDdPekFBNTRiSkJrSjZ3ODNjREdSOEQ1MWF4WUtnS0crS2Q4RU9lRU40UFkrampLeVVw
+    S1UzbzhvKytKS0VLczhKMnJhZW1iKzVZbGdpWTFaZUROaEw0THJVVmEzY0l5QXB3S0JnR1
+    hvNTZ1NkFyZW9TRU54NWFsdkdHdDllWVkvajNqVDUvTjlNaldzRGgvN2Z4ZUQ1OWF2UHpj
+    SnRzeE5uNDFlUUpwVnExcGtSS09CZ3htT2xYUC91SlVPNWU5MDZLQ1VZa2VIVEF0OE1SNX
+    VmT3pKdmo3SEEzVjd5bUdCUzlsQ1k0OXBURFB0bzNlcG1MZDNIMDVyREt2c1MwaFdPQWFI
+    TU4xQkJRNHJPLzZIQW9HQU1RSkkvUXBjWlRKME9BNEVXbDVLUk93dXZhTGFFZW9oYUlWdm
+    IyOWJsMkFuUmp3Z0RBTytQTnQ4REx2MHVNQ2VrcGl4ZXF0UENheGhqNUdhQ1BpVEJFaHhm
+    eWRpcVpBekFRVXcreGMxTlRWMGxxbE8xbVJmV0tvZnFaRmdmZ0toazlIdFk0ZE8yZzZMU2
+    03RG1ob21DOTdHYzhINUc5T1RMMjVGOUdHRVgxTUNnWUVBNUNrcUF2bEpmeUNtNWxHcDJn
+    TE1md0VsRjFvWXRnQzV4UkRwekk2RG5NaktoVXhlSmFNZ1JrYW0zbXZNQTB6ZzU4WlRZOX
+    ErQ2VTU3lEb2hOWnBMRFpvbUc3bUV1TkRXQVBicGFmbzlnOHExZzd1Y1dHZUZSZ1ZBbWYw
+    eG1uSkhIbUFxT0RkVDlYMDJhYkpaTXVtYXdDUkR0UnBQS3ZOdGFtTzlqZXg5WWdNPQ==
+  POSTGRES_PASSWORD: cG9zdGdyZXM=
+  POSTGRES_USER: cG9zdGdyZXM=
+  RABBIT_MQ_PASSWORD: Z3Vlc3Q=
+  RABBIT_MQ_USER: Z3Vlc3Q=
+kind: Secret
+metadata:
+  labels:
+    environment: production
+  name: prod-app-secrets-m8kb2t96c8
+  namespace: production
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-booking-service
+  namespace: production
+spec:
+  ports:
+  - port: 8083
+    targetPort: 8083
+  selector:
+    app: booking-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-gateway-service
+  namespace: production
+spec:
+  ports:
+  - port: 8087
+    targetPort: 8087
+  selector:
+    app: gateway-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-hotel-service
+  namespace: production
+spec:
+  ports:
+  - port: 8082
+    targetPort: 8082
+  selector:
+    app: hotel-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-loyalty-service
+  namespace: production
+spec:
+  ports:
+  - port: 8085
+    targetPort: 8085
+  selector:
+    app: loyalty-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-payment-service
+  namespace: production
+spec:
+  ports:
+  - port: 8084
+    targetPort: 8084
+  selector:
+    app: payment-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-postgres-service
+  namespace: production
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-rabbit-service
+  namespace: production
+spec:
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+  - name: management
+    port: 15672
+    targetPort: 15672
+  selector:
+    app: rabbit-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-report-service
+  namespace: production
+spec:
+  ports:
+  - port: 8086
+    targetPort: 8086
+  selector:
+    app: report-service
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    environment: production
+  name: prod-app-session-service
+  namespace: production
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8081
+  selector:
+    app: session-service
+    environment: production
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    environment: production
+    type: local
+  name: prod-app-postgres-pv
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /mnt/data/postgres
+    type: DirectoryOrCreate
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    environment: production
+  name: prod-app-postgres-pvc
+  namespace: production
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-booking-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: booking-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: reservations_db
+        - name: RABBIT_MQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_USER
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: RABBIT_MQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: RABBIT_MQ_QUEUE_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_QUEUE_NAME
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_EXCHANGE
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_EXCHANGE
+              name: prod-app-config-5kkf4f6m65
+        - name: HOTEL_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: HOTEL_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: HOTEL_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: HOTEL_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: PAYMENT_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: PAYMENT_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: PAYMENT_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: PAYMENT_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: LOYALTY_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: LOYALTY_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: LOYALTY_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: LOYALTY_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/booking-service:latest
+        imagePullPolicy: IfNotPresent
+        name: booking-service
+        ports:
+        - containerPort: 8083
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-gateway-service
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gateway-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: SESSION_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: SESSION_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: SESSION_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: SESSION_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: HOTEL_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: HOTEL_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: HOTEL_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: HOTEL_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: BOOKING_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: BOOKING_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: BOOKING_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: BOOKING_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: PAYMENT_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: PAYMENT_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: PAYMENT_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: PAYMENT_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: LOYALTY_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: LOYALTY_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: LOYALTY_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: LOYALTY_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: REPORT_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: REPORT_SERVICE_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: REPORT_SERVICE_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: REPORT_SERVICE_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/gateway-service:latest
+        imagePullPolicy: IfNotPresent
+        name: gateway-service
+        ports:
+        - containerPort: 8087
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-hotel-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hotel-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hotel-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: hotels_db
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/hotel-service:latest
+        imagePullPolicy: IfNotPresent
+        name: hotel-service
+        ports:
+        - containerPort: 8082
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-loyalty-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loyalty-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: loyalty-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: balances_db
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/loyalty-service:latest
+        imagePullPolicy: IfNotPresent
+        name: loyalty-service
+        ports:
+        - containerPort: 8085
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-payment-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: payment-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: payments_db
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/payment-service:latest
+        imagePullPolicy: IfNotPresent
+        name: payment-service
+        ports:
+        - containerPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-postgres-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: postgres
+        image: postgres:13-alpine
+        name: postgres-service
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+          subPath: pgdata
+        - mountPath: /docker-entrypoint-initdb.d
+          name: postgres-init-script
+          readOnly: true
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: prod-app-postgres-pvc
+      - configMap:
+          defaultMode: 493
+          name: prod-postgres-init-script-466m8th9cb
+        name: postgres-init-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-rabbit-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbit-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rabbit-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        image: rabbitmq:3-management-alpine
+        name: rabbit-service
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-report-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: report-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: statistics_db
+        - name: RABBIT_MQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_USER
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: RABBIT_MQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: RABBIT_MQ_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: RABBIT_MQ_QUEUE_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_QUEUE_NAME
+              name: prod-app-config-5kkf4f6m65
+        - name: RABBIT_MQ_EXCHANGE
+          valueFrom:
+            configMapKeyRef:
+              key: RABBIT_MQ_EXCHANGE
+              name: prod-app-config-5kkf4f6m65
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/report-service:latest
+        imagePullPolicy: IfNotPresent
+        name: report-service
+        ports:
+        - containerPort: 8086
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: production
+  name: prod-app-session-service
+  namespace: production
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: session-service
+      environment: production
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: session-service
+        environment: production
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PORT
+              name: prod-app-config-5kkf4f6m65
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_USER
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: POSTGRES_PASSWORD
+              name: prod-app-secrets-m8kb2t96c8
+        - name: POSTGRES_DB
+          value: users_db
+        - name: AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: AUTH_TOKEN
+              name: prod-app-secrets-m8kb2t96c8
+        image: xedll/session-service:latest
+        imagePullPolicy: IfNotPresent
+        name: session-service
+        ports:
+        - containerPort: 8081
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    environment: production
+  name: prod-app-wildcard-cert
+  namespace: production
+spec:
+  commonName: '*.do11.com'
+  dnsNames:
+  - do11.com
+  - '*.do11.com'
+  issuerRef:
+    kind: ClusterIssuer
+    name: selfsigned-issuer
+  secretName: my-wildcard-tls
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  labels:
+    environment: production
+  name: prod-app-selfsigned-issuer
+  namespace: production
+spec:
+  selfSigned: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  labels:
+    environment: production
+  name: prod-app-my-app-ingress
+  namespace: production
+spec:
+  rules:
+  - host: app.do11.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: prod-app-gateway-service
+            port:
+              number: 8087
+        path: /api/v1/gateway
+        pathType: Prefix
+      - backend:
+          service:
+            name: prod-app-session-service
+            port:
+              number: 8081
+        path: /api/v1/auth/authorize
+        pathType: Prefix
+  tls:
+  - hosts:
+    - app.do11.com
+    secretName: my-wildcard-tls

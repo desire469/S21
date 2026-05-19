@@ -1,0 +1,10 @@
+resources:
+    - deployment.yaml
+    - service.yaml
+    - utils/cert_manager.yaml
+    - utils/ingress.yaml
+    - utils/postgres-pvc.yaml
+namePrefix: app-
+namespace: development
+commonLabels:
+    environment: development

@@ -19,7 +19,6 @@ Vagrant.configure("2") do |config|
       manager.vm.network "forwarded_port", guest: 8081, host: 8081, host_ip: "127.0.0.1", id: "nginx_api_8081"
 
       manager.vm.provision "shell", inline: 'curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable=traefik --node-ip=192.168.56.11 --flannel-backend=host-gw" sh - && cp /var/lib/rancher/k3s/server/node-token /home/vagrant/src/node-token', name: "install_manager"
-      manager.vm.provision "shell", inline: 'sudo apt install nginx && cp /home/vagrant/src/services/nginx/default.conf /etc/nginx/conf.d/default.conf', name: "install_nginx"
     end
   
     config.vm.define "worker01" do |worker|

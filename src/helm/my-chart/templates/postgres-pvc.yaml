@@ -1,0 +1,14 @@
+{{- if .Values.postgresPVC.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.postgresPVC.name }}
+  namespace: {{ .Values.postgresPVC.namespace | default .Release.Namespace }}
+spec:
+  accessModes:
+    {{- toYaml .Values.postgresPVC.accessModes | nindent 4 }}
+  storageClassName: {{ .Values.postgresPVC.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.postgresPVC.storage }}
+{{- end }}

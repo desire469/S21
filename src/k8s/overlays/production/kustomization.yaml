@@ -1,0 +1,136 @@
+resources:
+    - ../../base
+    - namespace.yaml
+
+namePrefix: prod-
+namespace: production
+
+commonLabels:
+    environment: production
+
+patchesStrategicMerge:
+    - replicas-patch.yaml
+
+configMapGenerator:
+    - name: app-config
+      envs:
+          - static/.env.template
+
+    - name: postgres-init-script
+      files:
+          - static/database/init.sql
+
+replacements:
+    - source:
+          kind: Service
+          name: postgres-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.POSTGRES_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: rabbit-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.RABBIT_MQ_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: session-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.SESSION_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: hotel-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.HOTEL_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: booking-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.BOOKING_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: payment-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.PAYMENT_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: loyalty-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.LOYALTY_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: report-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.REPORT_SERVICE_HOST
+            options:
+                create: true
+    - source:
+          kind: Service
+          name: gateway-service # исходное имя (без префикса)
+          fieldPath: metadata.name
+      targets:
+          - select:
+                kind: ConfigMap
+                name: app-config
+            fieldPaths:
+                - data.GATEWAY_SERVICE_HOST
+            options:
+                create: true
+
+secretGenerator:
+    - name: app-secrets
+      envs:
+          - static/.env.secret

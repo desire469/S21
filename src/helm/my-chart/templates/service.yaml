@@ -1,0 +1,32 @@
+{{- range $name, $svc := .Values.services }}
+{{- if $svc.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+    {{- include "my-chart.labels" $ | nindent 4 }}
+spec:
+  selector:
+    app: {{ $name }}
+  {{- if $svc.service.type }}
+  type: {{ $svc.service.type }}
+  {{- else }}
+  type: ClusterIP
+  {{- end }}
+  {{- if $svc.service.ports }}
+  ports:
+    {{- toYaml $svc.service.ports | nindent 4 }}
+  {{- else if $svc.service.port }}
+  ports:
+    - port: {{ $svc.service.port }}
+      targetPort: {{ $svc.service.targetPort | default $svc.service.port }}
+      protocol: TCP
+      {{- if $svc.service.name }}
+      name: {{ $svc.service.name }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

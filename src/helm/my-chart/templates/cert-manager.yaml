@@ -1,0 +1,22 @@
+{{- if .Values.certManager.enabled }}
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.certManager.clusterIssuer.name }}
+spec:
+  selfSigned: {{ toYaml .Values.certManager.clusterIssuer.selfSigned | nindent 2 }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.certManager.certificate.name }}
+spec:
+  secretName: {{ .Values.certManager.certificate.secretName }}
+  issuerRef:
+    name: {{ .Values.certManager.clusterIssuer.name }}
+    kind: ClusterIssuer
+  commonName: {{ .Values.certManager.certificate.commonName | quote }}
+  dnsNames:
+    {{- toYaml .Values.certManager.certificate.dnsNames | nindent 4 }}
+{{- end }}

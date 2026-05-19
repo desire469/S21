@@ -1,0 +1,581 @@
+replicaCount: 1
+strategy:
+    type: Recreate
+
+httpRoute:
+    enabled: false
+
+imagePullPolicy: IfNotPresent
+
+configMap:
+    name: app-config
+    data:
+        SESSION_SERVICE_HOST: "session-service"
+        SESSION_SERVICE_PORT: "8081"
+        HOTEL_SERVICE_HOST: "hotel-service"
+        HOTEL_SERVICE_PORT: "8082"
+        BOOKING_SERVICE_HOST: "booking-service"
+        BOOKING_SERVICE_PORT: "8083"
+        PAYMENT_SERVICE_HOST: "payment-service"
+        PAYMENT_SERVICE_PORT: "8084"
+        LOYALTY_SERVICE_HOST: "loyalty-service"
+        LOYALTY_SERVICE_PORT: "8085"
+        REPORT_SERVICE_HOST: "report-service"
+        REPORT_SERVICE_PORT: "8086"
+        POSTGRES_HOST: "postgres-service"
+        POSTGRES_PORT: "5432"
+        RABBIT_MQ_HOST: "rabbit-service"
+        RABBIT_MQ_PORT: "5672"
+        RABBIT_MQ_QUEUE_NAME: "booking_queue"
+        RABBIT_MQ_EXCHANGE: "booking_exchange"
+        test: "test"
+
+secrets:
+    name: app-secrets
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "postgres"
+    RABBIT_MQ_USER: "guest"
+    RABBIT_MQ_PASSWORD: "guest"
+    AUTH_TOKEN: "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC9Q1hl6ossCg5Tr43IW0px2Wz0tDOKRHncreZcew3G+63QuXrLSb5BRh24q0ej4W+Wj8/6RR6vwG1hFtPIBqy6OYUvEdBmOay9eEpzQc2Xy253qSQyxco4FmyNLAwfyk0JS5DKdagT6ct3AqQe9+oGsEHf18CWD/dnYrfKI644uqniI3Lzrk+YnIwZ8BChKMN40qd7XkRuWsJBGEJr+hp1F1KvaYbPz/gqvBJS+IlG37/6mO1xoMaDfPxEUCJbHiWS8PcSeC9TllVVtC+oyPnQzYEbBh7ZfxbwAD3y5FW3qxWN33sQ53XaH7zHondMAQJ6hQROCb6Ml/0bBKfU0hz9AgMBAAECggEANI56Arsx8IXOWrDaZ3PqZVkiZ4WO9mtzh7OGz9GgDsyfBOIs1jzhJ1EoObrehwS4LxA6id4d2mJOPXLQVrB70K7ebCa/P1PuwyKfUghI5kkooPQISE0ijZa0iDNeHonYAKfKSl6H0RfQV3kVSEBB7Z+Oe3F3WnSOmFgSf4CPBdNc240kanQlxsmKjsDmsxLePiYNxU6vDoZt/JKQmSwQUIgznMm7upEmh3UR8q7N757I+dTEhGxs8LLGyvJ2nGnolH9fpkXJlAKHAUvnX1NfUkCgIGiVqpsxwHb5jTmjqpH1U8usaSPZDD0uLf4DLUjIgddpSGcUIjKlaNO9sQXsBQKBgQD5XpNMqgIZgtfEOVJ44auMZqCsIuKXwsICNZmeqSkv5J29ov3V/fkBjDpwiyEXO/9HeFOUEGSNGeFPF4ha0KnNFmeTwDCIPA2vyF3Z049GfRytc4qDqwdplVjgPBPKfrGNmGdHlKKoEHGjpWnuJgOkNhenPKG7zbevpty7TqgluwKBgQDCS6JEl9j34gp5+MoxIbkXt1WOwngnFwRscklTEGJ4wZ3i6GtKIOVzYd7VDqgomB/jnkDQlBK47OzAA54bJBkJ6w83cDGR8D51axYKgKG+Kd8EOeEN4PY+jjKyUpKU3o8o++JKEKs8J2raemb+5YlgiY1ZeDNhL4LrUVa3cIyApwKBgGXo56u6AreoSENx5alvGGt9eYY/j3jT5/N9MjWsDh/7fxeD59avPzcJtsxNn41eQJpVq1pkRKOBgxmOlXP/uJUO5e906KCUYkeHTAt8MR5ufOzJvj7HA3V7ymGBS9lCY49pTDPto3epmLd3H05rDKvsS0hWOAaHMN1BBQ4rO/6HAoGAMQJI/QpcZTJ0OA4EWl5KROwuvaLaEeohaIVvb29bl2AnRjwgDAO+PNt8DLv0uMCekpixeqtPCaxhj5GaCPiTBEhxfydiqZAzAQUw+xc1NTV0lqlO1mRfWKofqZFgfgKhk9HtY4dO2g6LSm7DmhomC97Gc8H5G9OTL25F9GGEX1MCgYEA5CkqAvlJfyCm5lGp2gLMfwElF1oYtgC5xRDpzI6DnMjKhUxeJaMgRkam3mvMA0zg58ZTY9q+CeSSyDohNZpLDZomG7mEuNDWAPbpafo9g8q1g7ucWGeFRgVAmf0xmnJHHmAqODdT9X02abJZMumawCRDtRpPKvNtamO9jex9YgM="
+
+services:
+    gateway-service:
+        enabled: true
+        image:
+            repository: xedll/gateway-service
+            tag: latest
+        port: 8087
+        env:
+          - name: SESSION_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: SESSION_SERVICE_HOST
+          - name: SESSION_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: SESSION_SERVICE_PORT
+          - name: HOTEL_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: HOTEL_SERVICE_HOST
+          - name: HOTEL_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: HOTEL_SERVICE_PORT
+          - name: BOOKING_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: BOOKING_SERVICE_HOST
+          - name: BOOKING_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: BOOKING_SERVICE_PORT
+          - name: PAYMENT_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: PAYMENT_SERVICE_HOST
+          - name: PAYMENT_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: PAYMENT_SERVICE_PORT
+          - name: LOYALTY_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: LOYALTY_SERVICE_HOST
+          - name: LOYALTY_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: LOYALTY_SERVICE_PORT
+          - name: REPORT_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: REPORT_SERVICE_HOST
+          - name: REPORT_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: REPORT_SERVICE_PORT
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8087
+            targetPort: 8087
+
+    booking-service:
+        enabled: true
+        image:
+            repository: xedll/booking-service
+            tag: latest
+        port: 8083
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "reservations_db"
+          - name: RABBIT_MQ_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_HOST
+          - name: RABBIT_MQ_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_PORT
+          - name: RABBIT_MQ_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_USER
+          - name: RABBIT_MQ_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_PASSWORD
+          - name: RABBIT_MQ_QUEUE_NAME
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_QUEUE_NAME
+          - name: RABBIT_MQ_EXCHANGE
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_EXCHANGE
+          - name: HOTEL_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: HOTEL_SERVICE_HOST
+          - name: HOTEL_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: HOTEL_SERVICE_PORT
+          - name: PAYMENT_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: PAYMENT_SERVICE_HOST
+          - name: PAYMENT_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: PAYMENT_SERVICE_PORT
+          - name: LOYALTY_SERVICE_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: LOYALTY_SERVICE_HOST
+          - name: LOYALTY_SERVICE_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: LOYALTY_SERVICE_PORT
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8083
+            targetPort: 8083
+
+    hotel-service:
+        enabled: true
+        image:
+            repository: xedll/hotel-service
+            tag: latest
+        port: 8082
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "hotels_db"
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8082
+            targetPort: 8082
+
+    loyalty-service:
+        enabled: true
+        image:
+            repository: xedll/loyalty-service
+            tag: latest
+        port: 8085
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "balances_db"
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8085
+            targetPort: 8085
+
+    payment-service:
+        enabled: true
+        image:
+            repository: xedll/payment-service
+            tag: latest
+        port: 8084
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "payments_db"
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8084
+            targetPort: 8084
+
+    postgres-service:
+        enabled: true
+        image:
+            repository: postgres
+            tag: 13-alpine
+        port: 5432
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "postgres"
+        volumeMounts:
+          - name: postgres-storage
+            mountPath: /var/lib/postgresql/data
+            subPath: pgdata
+          - name: postgres-init-script
+            mountPath: /docker-entrypoint-initdb.d
+            readOnly: true
+        volumes:
+          - name: postgres-storage
+            persistentVolumeClaim:
+                claimName: postgres-pvc2
+          - name: postgres-init-script
+            configMap:
+                name: postgres-init-script
+                defaultMode: 755
+        service:
+            port: 5432
+            targetPort: 5432
+
+    rabbit-service:
+        enabled: true
+        image:
+            repository: rabbitmq
+            tag: 3-management-alpine
+        ports:
+          - containerPort: 5672
+          - containerPort: 15672
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_USER
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_PASSWORD
+        service:
+            ports:
+              - name: amqp
+                port: 5672
+                targetPort: 5672
+              - name: management
+                port: 15672
+                targetPort: 15672
+
+    report-service:
+        enabled: true
+        image:
+            repository: xedll/report-service
+            tag: latest
+        port: 8086
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "statistics_db"
+          - name: RABBIT_MQ_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_HOST
+          - name: RABBIT_MQ_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_PORT
+          - name: RABBIT_MQ_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_USER
+          - name: RABBIT_MQ_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: RABBIT_MQ_PASSWORD
+          - name: RABBIT_MQ_QUEUE_NAME
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_QUEUE_NAME
+          - name: RABBIT_MQ_EXCHANGE
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: RABBIT_MQ_EXCHANGE
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8086
+            targetPort: 8086
+
+    session-service:
+        enabled: true
+        image:
+            repository: xedll/session-service
+            tag: latest
+        port: 8081
+        env:
+          - name: POSTGRES_HOST
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_HOST
+          - name: POSTGRES_PORT
+            valueFrom:
+                configMapKeyRef:
+                    name: app-config
+                    key: POSTGRES_PORT
+          - name: POSTGRES_USER
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            value: "users_db"
+          - name: AUTH_TOKEN
+            valueFrom:
+                secretKeyRef:
+                    name: app-secrets
+                    key: AUTH_TOKEN
+        service:
+            port: 8081
+            targetPort: 8081
+
+persistence:
+    enabled: true
+    storageClassName: ""
+    accessMode: ReadWriteOnce
+    size: 1Gi
+
+postgresInitScript: |
+    \c postgres;
+    DROP DATABASE IF EXISTS users_db;
+    CREATE DATABASE users_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS hotels_db;
+    CREATE DATABASE hotels_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS reservations_db;
+    CREATE DATABASE reservations_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS payments_db;
+    CREATE DATABASE payments_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS balances_db;
+    CREATE DATABASE balances_db OWNER postgres;
+
+    DROP DATABASE IF EXISTS statistics_db;
+    CREATE DATABASE statistics_db OWNER postgres;
+
+certManager:
+    enabled: false
+    clusterIssuer:
+        name: selfsigned-issuer
+        selfSigned: {}
+    certificate:
+        name: wildcard-cert
+        secretName: my-wildcard-tls
+        commonName: "*.do11.com"
+        dnsNames:
+          - "do11.com"
+          - "*.do11.com"
+
+ingress:
+    ingressClassName: nginx
+    enabled: true
+    name: my-app-ingress
+    annotations:
+        kubernetes.io/ingress.class: nginx
+    tls:
+        hosts:
+          - app.do11.com
+        secretName: my-wildcard-tls
+    rules:
+      - host: app.do11.com
+        paths:
+          - path: /api/v1/gateway
+            pathType: Prefix
+            service:
+                name: gateway-service
+                port: 8087
+          - path: /api/v1/auth/authorize
+            pathType: Prefix
+            service:
+                name: session-service
+                port: 8081
+
+postgresPV:
+    enabled: true
+    name: postgres-pv2
+    capacity: 5Gi
+    accessModes:
+      - ReadWriteOnce
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: manual
+    hostPath: "/mnt/data/postgres"
+
+postgresPVC:
+    enabled: true
+    name: postgres-pvc2
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: manual
+    storage: 5Gi

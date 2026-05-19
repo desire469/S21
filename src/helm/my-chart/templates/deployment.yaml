@@ -1,0 +1,46 @@
+{{- range $name, $service := .Values.services }}
+{{- if $service.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+    {{- include "my-chart.labels" $ | nindent 4 }}
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  strategy:
+    {{- toYaml $.Values.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+      - name: {{ $name }}
+        image: "{{ $service.image.repository }}:{{ $service.image.tag }}"
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
+        {{- if $service.port }}
+        ports:
+        - containerPort: {{ $service.port }}
+        {{- end }}
+        {{- if $service.ports }}
+        ports:
+        {{- toYaml $service.ports | nindent 8 }}
+        {{- end }}
+        env:
+        {{- toYaml $service.env | nindent 8 }}
+        {{- if $service.volumeMounts }}
+        volumeMounts:
+        {{- toYaml $service.volumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if $service.volumes }}
+      volumes:
+      {{- toYaml $service.volumes | nindent 6 }}
+      {{- end }}
+{{- end }}
+{{- end }}
